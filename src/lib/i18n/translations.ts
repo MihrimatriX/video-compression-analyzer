@@ -5,6 +5,7 @@ export const translations = {
     // Navigation
     "nav.home": "Ana Sayfa",
     "nav.converter": "Dönüştürücü",
+    "nav.converterWarning": "İyi çalışmıyor olabilir",
     "nav.settings": "Ayarlar",
     "nav.ffmpegGuide": "FFmpeg Rehberi",
     "nav.compare": "Karşılaştır",
@@ -527,6 +528,7 @@ export const translations = {
     // Navigation
     "nav.home": "Home",
     "nav.converter": "Converter",
+    "nav.converterWarning": "May not work well",
     "nav.settings": "Settings",
     "nav.ffmpegGuide": "FFmpeg Guide",
     "nav.compare": "Compare",

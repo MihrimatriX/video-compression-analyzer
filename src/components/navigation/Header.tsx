@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { FileVideo, Settings, BookOpen, GitCompare, Play } from "lucide-react";
+import { FileVideo, Settings, BookOpen, GitCompare, Play, AlertTriangle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "./ThemeToggle";
 import { LanguageToggle } from "./LanguageToggle";
@@ -76,9 +76,13 @@ export function Header() {
                         ? "text-primary"
                         : "text-muted-foreground hover:text-foreground"
                     )}
+                    title={item.href === "/converter" ? t("nav.converterWarning") : undefined}
                   >
                     <Icon className="h-4 w-4" />
                     <span>{item.label}</span>
+                    {item.href === "/converter" && (
+                      <AlertTriangle className="h-3 w-3 text-yellow-500" />
+                    )}
                     {isActive && (
                       <motion.div
                         layoutId="activeNav"
