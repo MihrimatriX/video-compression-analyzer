@@ -2,7 +2,15 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Copy, Check, Info, Loader2, Clock } from "lucide-react";
+import {
+  Copy,
+  Check,
+  Info,
+  Loader2,
+  Clock,
+  Download,
+  Play,
+} from "lucide-react";
 import {
   Card,
   CardContent,
@@ -24,6 +32,11 @@ import { FFmpegCommandHighlighter } from "@/components/ui/ffmpeg-command-highlig
 import type { VideoFile } from "@/lib/types/video";
 import { useVideoStore } from "@/lib/store/video-store";
 import { useTranslation } from "@/lib/i18n/use-translation";
+import {
+  convertVideo,
+  type ConversionProgress,
+} from "@/lib/ffmpeg/video-converter";
+import { isWebCodecsSupported } from "@/lib/ffmpeg/webcodecs-converter";
 
 interface VideoCardProps {
   video: VideoFile;
@@ -41,6 +54,11 @@ export function VideoCard({
   const [copiedCommand, setCopiedCommand] = useState(false);
   const [copiedSettings, setCopiedSettings] = useState(false);
   const [selectedCodecIndex, setSelectedCodecIndex] = useState(0);
+  const [isConverting, setIsConverting] = useState(false);
+  const [conversionProgress, setConversionProgress] =
+    useState<ConversionProgress | null>(null);
+  const [conversionError, setConversionError] = useState<string | null>(null);
+  const [useWebCodecs, setUseWebCodecs] = useState(isWebCodecsSupported());
 
   // Tüm hook'lar conditional return'den önce çağrılmalı
   const recommendations = video.analysis?.recommendations || [];
@@ -191,6 +209,86 @@ export function VideoCard({
     }
   };
 
+  const handleConvert = async () => {
+    if (!video.file || !currentRecommendation) return;
+
+    setIsConverting(true);
+    setConversionError(null);
+    setConversionProgress({ progress: 0, time: 0 });
+
+    try {
+      // Conversion options'ı oluştur
+      // Bitrate bps (bits per second) olarak geliyor, FFmpeg için k/M formatına çevir
+      const formatBitrate = (bps: number): string => {
+        if (bps >= 1000000) {
+          return `${Math.round(bps / 1000000)}M`;
+        }
+        return `${Math.round(bps / 1000)}k`;
+      };
+
+      const options = {
+        codec: currentRecommendation.codec,
+        // CRF veya quality varsa bitrate kullanma (CRF modu)
+        bitrate:
+          !currentRecommendation.crf &&
+          !currentRecommendation.quality &&
+          currentRecommendation.bitrate
+            ? formatBitrate(currentRecommendation.bitrate)
+            : undefined,
+        crf: currentRecommendation.crf,
+        quality: currentRecommendation.quality,
+        preset: currentRecommendation.preset,
+        resolution: currentRecommendation.resolution,
+        audioBitrate: currentRecommendation.audioBitrate
+          ? formatBitrate(currentRecommendation.audioBitrate)
+          : "128k",
+        audioCodec: currentRecommendation.audioCodec,
+        pixelFormat: metadata.pixelFormat || "yuv420p",
+      };
+
+      const blob = await convertVideo(
+        video.file,
+        options,
+        (progress) => {
+          setConversionProgress(progress);
+        },
+        t
+      );
+
+      // Dosyayı indir
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      const outputExtension =
+        options.codec === "vp9" || options.codec === "av1" ? ".webm" : ".mp4";
+      a.download = `${video.file.name.replace(
+        /\.[^/.]+$/,
+        ""
+      )}_converted${outputExtension}`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      setConversionProgress({
+        progress: 100,
+        time: 0,
+        message: t("conversion.completed"),
+      });
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      setConversionError(errorMessage);
+      console.error("Conversion hatası:", error);
+    } finally {
+      setIsConverting(false);
+      setTimeout(() => {
+        setConversionProgress(null);
+        setConversionError(null);
+      }, 3000);
+    }
+  };
+
   const formatTime = (seconds: number): string => {
     if (seconds < 60) return `${Math.round(seconds)}sn`;
     const minutes = Math.floor(seconds / 60);
@@ -215,13 +313,13 @@ export function VideoCard({
         }`}
       >
         {/* Thumbnail - Sol taraf (daha kompakt) */}
-        <div className="relative w-24 h-auto min-h-[120px] shrink-0 bg-muted overflow-hidden group">
+        <div className="relative w-24 h-24 shrink-0 bg-muted overflow-hidden group">
           {metadata.thumbnail && metadata.thumbnail.trim() !== "" ? (
             <>
               <img
                 src={metadata.thumbnail}
                 alt={metadata.filename}
-                className="h-full w-full object-cover transition-opacity"
+                className="w-full h-full object-cover transition-opacity"
                 loading="lazy"
                 onError={(e) => {
                   // Thumbnail yüklenemezse fallback göster
@@ -297,9 +395,9 @@ export function VideoCard({
             </CardDescription>
           </CardHeader>
 
-          <CardContent className="flex-1 px-3 pb-3 space-y-2">
+          <CardContent className="flex-1 px-3 pb-3 space-y-2 overflow-y-auto max-h-[600px]">
             <Tabs defaultValue="current" className="w-full">
-              <TabsList className="grid w-full grid-cols-2 h-6">
+              <TabsList className="grid w-full grid-cols-2 h-7">
                 <TabsTrigger value="current" className="text-[11px]">
                   {t("video.current")}
                 </TabsTrigger>
@@ -478,7 +576,7 @@ export function VideoCard({
                       </span>
                     </div>
                   )}
-                  <div className="flex items-center justify-between col-span-2 sm:col-span-3 pt-1 border-t">
+                  <div className="flex items-center justify-between col-span-2 sm:col-span-3 pt-1.5 border-t mt-1">
                     <div className="flex items-center gap-1 text-muted-foreground">
                       <Clock className="h-3 w-3" />
                       <span>{t("video.estimatedTime")}</span>
@@ -540,7 +638,59 @@ export function VideoCard({
                         </>
                       )}
                     </Button>
+                    <Button
+                      variant="default"
+                      size="sm"
+                      onClick={handleConvert}
+                      disabled={
+                        isConverting ||
+                        (!useWebCodecs && video.file.size > 50 * 1024 * 1024)
+                      }
+                      className="h-6 px-2 text-[10px] shrink-0"
+                      title={
+                        !useWebCodecs && video.file.size > 50 * 1024 * 1024
+                          ? t("conversion.fileTooLargeTooltip")
+                          : useWebCodecs
+                          ? t("conversion.gpuAcceleration")
+                          : t("conversion.convertAndDownload")
+                      }
+                    >
+                      {isConverting ? (
+                        <>
+                          <Loader2 className="mr-1 h-3 w-3 animate-spin" />
+                          {conversionProgress?.progress
+                            ? `${Math.round(conversionProgress.progress)}%`
+                            : "..."}
+                        </>
+                      ) : (
+                        <>
+                          <Play className="mr-1 h-3 w-3" />
+                          {t("video.convert")}
+                        </>
+                      )}
+                    </Button>
                   </div>
+                  {(isConverting || conversionProgress || conversionError) && (
+                    <div className="mt-2 space-y-1">
+                      {conversionProgress && (
+                        <div className="space-y-1">
+                          <Progress value={conversionProgress.progress} />
+                          {conversionProgress.message && (
+                            <p className="text-[10px] text-muted-foreground">
+                              {conversionProgress.message}
+                              {conversionProgress.speed &&
+                                ` • ${conversionProgress.speed}`}
+                            </p>
+                          )}
+                        </div>
+                      )}
+                      {conversionError && (
+                        <div className="rounded-md bg-destructive/10 p-2 text-[10px] text-destructive">
+                          {conversionError}
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               </TabsContent>
             </Tabs>

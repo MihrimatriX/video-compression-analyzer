@@ -45,6 +45,7 @@ export interface CompressionRecommendation {
   explanation: string;
   audioCodec?: string;
   audioBitrate?: number;
+  pixelFormat?: string;
 }
 
 export interface VideoAnalysis {

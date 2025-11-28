@@ -3,22 +3,27 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { FileVideo, Settings, BookOpen, GitCompare } from "lucide-react";
+import { FileVideo, Settings, BookOpen, GitCompare, Play } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "./ThemeToggle";
 import { LanguageToggle } from "./LanguageToggle";
 import { useTranslation } from "@/lib/i18n/use-translation";
+import { useMemo } from "react";
 
 export function Header() {
   const pathname = usePathname();
   const { t } = useTranslation();
 
-  const navItems = [
-    { href: "/", label: t("nav.home"), icon: FileVideo },
-    { href: "/compare", label: t("nav.compare"), icon: GitCompare },
-    { href: "/settings", label: t("nav.settings"), icon: Settings },
-    { href: "/ffmpeg-guide", label: t("nav.ffmpegGuide"), icon: BookOpen },
-  ];
+  const navItems = useMemo(
+    () => [
+      { href: "/", label: t("nav.home"), icon: FileVideo },
+      { href: "/converter", label: t("nav.converter"), icon: Play },
+      { href: "/compare", label: t("nav.compare"), icon: GitCompare },
+      { href: "/settings", label: t("nav.settings"), icon: Settings },
+      { href: "/ffmpeg-guide", label: t("nav.ffmpegGuide"), icon: BookOpen },
+    ],
+    [t]
+  );
 
   return (
     <>
