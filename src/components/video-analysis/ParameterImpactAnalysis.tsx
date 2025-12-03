@@ -230,7 +230,9 @@ export function ParameterImpactAnalysis() {
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1.5">
-                        <span className="text-sm font-semibold">{param.name}</span>
+                        <span className="text-sm font-semibold">
+                          {param.name}
+                        </span>
                         <Badge
                           variant={
                             param.recommendation === "good"

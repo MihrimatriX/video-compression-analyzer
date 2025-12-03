@@ -12,7 +12,8 @@ export function LanguageToggle() {
     { code: "en", label: "English", flag: "🇬🇧" },
   ];
 
-  const currentLang = languages.find((l) => l.code === language) || languages[0];
+  const currentLang =
+    languages.find((l) => l.code === language) || languages[0];
   const nextLang = languages.find((l) => l.code !== language) || languages[1];
 
   const handleToggle = () => {
@@ -26,11 +27,14 @@ export function LanguageToggle() {
       size="sm"
       onClick={handleToggle}
       className="h-9 px-2 gap-1.5 hover:bg-muted transition-colors"
-      title={`${language === "tr" ? "Switch to English" : "Türkçe'ye geç"}: ${nextLang.label}`}
+      title={`${language === "tr" ? "Switch to English" : "Türkçe'ye geç"}: ${
+        nextLang.label
+      }`}
     >
       <span className="text-base">{currentLang.flag}</span>
-      <span className="text-xs font-medium">{currentLang.code.toUpperCase()}</span>
+      <span className="text-xs font-medium">
+        {currentLang.code.toUpperCase()}
+      </span>
     </Button>
   );
 }
-

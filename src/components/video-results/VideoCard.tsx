@@ -1,16 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import {
-  Copy,
-  Check,
-  Info,
-  Loader2,
-  Clock,
-  Download,
-  Play,
-} from "lucide-react";
+import { motion } from "framer-motion";
+import { Copy, Check, Info, Loader2, Clock, Play } from "lucide-react";
 import {
   Card,
   CardContent,

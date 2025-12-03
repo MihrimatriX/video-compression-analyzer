@@ -17,9 +17,7 @@ export default function FFmpegGuidePage() {
     <div className="container mx-auto max-w-5xl px-4 py-6 space-y-6">
       <div className="space-y-2">
         <h1 className="text-2xl sm:text-3xl font-bold">{t("guide.title")}</h1>
-        <p className="text-sm text-muted-foreground">
-          {t("guide.subtitle")}
-        </p>
+        <p className="text-sm text-muted-foreground">{t("guide.subtitle")}</p>
       </div>
 
       <Tabs defaultValue="basics" className="w-full">
@@ -45,7 +43,9 @@ export default function FFmpegGuidePage() {
                 </code>
               </div>
               <div>
-                <h3 className="font-semibold mb-2">{t("guide.basics.parameters")}</h3>
+                <h3 className="font-semibold mb-2">
+                  {t("guide.basics.parameters")}
+                </h3>
                 <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
                   <li>
                     <strong>-i:</strong> {t("guide.basics.param.i")}
@@ -82,7 +82,9 @@ export default function FFmpegGuidePage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <h3 className="font-semibold mb-2">{t("guide.basics.install.windows")}</h3>
+                <h3 className="font-semibold mb-2">
+                  {t("guide.basics.install.windows")}
+                </h3>
                 <div className="rounded-md bg-muted p-4">
                   <code className="text-sm">
                     {t("guide.basics.install.windows.choco")}
@@ -95,7 +97,9 @@ export default function FFmpegGuidePage() {
                 </div>
               </div>
               <div>
-                <h3 className="font-semibold mb-2">{t("guide.basics.install.macos")}</h3>
+                <h3 className="font-semibold mb-2">
+                  {t("guide.basics.install.macos")}
+                </h3>
                 <div className="rounded-md bg-muted p-4">
                   <code className="text-sm">
                     {t("guide.basics.install.macos.brew")}
@@ -105,7 +109,9 @@ export default function FFmpegGuidePage() {
                 </div>
               </div>
               <div>
-                <h3 className="font-semibold mb-2">{t("guide.basics.install.linux")}</h3>
+                <h3 className="font-semibold mb-2">
+                  {t("guide.basics.install.linux")}
+                </h3>
                 <div className="rounded-md bg-muted p-4">
                   <code className="text-sm">
                     # Ubuntu/Debian
@@ -132,7 +138,9 @@ export default function FFmpegGuidePage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <h3 className="font-semibold mb-2">{t("guide.codecs.h264.crf")}</h3>
+                <h3 className="font-semibold mb-2">
+                  {t("guide.codecs.h264.crf")}
+                </h3>
                 <div className="rounded-md bg-muted p-4">
                   <code className="text-sm">
                     ffmpeg -i input.mp4 -c:v libx264 -crf 23 -preset medium -c:a
@@ -141,7 +149,9 @@ export default function FFmpegGuidePage() {
                 </div>
               </div>
               <div>
-                <h3 className="font-semibold mb-2">{t("guide.codecs.h264.bitrate")}</h3>
+                <h3 className="font-semibold mb-2">
+                  {t("guide.codecs.h264.bitrate")}
+                </h3>
                 <div className="rounded-md bg-muted p-4">
                   <code className="text-sm">
                     ffmpeg -i input.mp4 -c:v libx264 -b:v 5M -preset medium -c:a
@@ -158,7 +168,9 @@ export default function FFmpegGuidePage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <h3 className="font-semibold mb-2">{t("guide.codecs.h265.crf")}</h3>
+                <h3 className="font-semibold mb-2">
+                  {t("guide.codecs.h265.crf")}
+                </h3>
                 <div className="rounded-md bg-muted p-4">
                   <code className="text-sm">
                     ffmpeg -i input.mp4 -c:v libx265 -crf 28 -preset medium -c:a
@@ -167,7 +179,9 @@ export default function FFmpegGuidePage() {
                 </div>
               </div>
               <div>
-                <h3 className="font-semibold mb-2">{t("guide.codecs.h265.bitrate")}</h3>
+                <h3 className="font-semibold mb-2">
+                  {t("guide.codecs.h265.bitrate")}
+                </h3>
                 <div className="rounded-md bg-muted p-4">
                   <code className="text-sm">
                     ffmpeg -i input.mp4 -c:v libx265 -b:v 3M -preset slow -c:a
@@ -184,7 +198,9 @@ export default function FFmpegGuidePage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <h3 className="font-semibold mb-2">{t("guide.codecs.vp9.quality")}</h3>
+                <h3 className="font-semibold mb-2">
+                  {t("guide.codecs.vp9.quality")}
+                </h3>
                 <div className="rounded-md bg-muted p-4">
                   <code className="text-sm">
                     ffmpeg -i input.mp4 -c:v libvpx-vp9 -crf 32 -b:v 0 -c:a
@@ -193,7 +209,9 @@ export default function FFmpegGuidePage() {
                 </div>
               </div>
               <div>
-                <h3 className="font-semibold mb-2">{t("guide.codecs.vp9.bitrate")}</h3>
+                <h3 className="font-semibold mb-2">
+                  {t("guide.codecs.vp9.bitrate")}
+                </h3>
                 <div className="rounded-md bg-muted p-4">
                   <code className="text-sm">
                     ffmpeg -i input.mp4 -c:v libvpx-vp9 -b:v 2M -c:a libopus
@@ -210,7 +228,9 @@ export default function FFmpegGuidePage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <h3 className="font-semibold mb-2">{t("guide.codecs.av1.quality")}</h3>
+                <h3 className="font-semibold mb-2">
+                  {t("guide.codecs.av1.quality")}
+                </h3>
                 <div className="rounded-md bg-muted p-4">
                   <code className="text-sm">
                     ffmpeg -i input.mp4 -c:v libaom-av1 -crf 35 -b:v 0 -c:a
@@ -219,7 +239,8 @@ export default function FFmpegGuidePage() {
                 </div>
               </div>
               <p className="text-sm text-muted-foreground">
-                <strong>{t("guide.codecs.av1.note")}</strong> {t("guide.codecs.av1.note.text")}
+                <strong>{t("guide.codecs.av1.note")}</strong>{" "}
+                {t("guide.codecs.av1.note.text")}
               </p>
               <div className="rounded-md bg-muted p-4">
                 <code className="text-sm">
@@ -258,7 +279,9 @@ export default function FFmpegGuidePage() {
                 </div>
               </div>
               <div>
-                <h3 className="font-semibold mb-2">{t("guide.tips.threads.title")}</h3>
+                <h3 className="font-semibold mb-2">
+                  {t("guide.tips.threads.title")}
+                </h3>
                 <div className="rounded-md bg-muted p-4">
                   <code className="text-sm">
                     ffmpeg -threads 8 -i input.mp4 -c:v libx264 output.mp4
@@ -266,7 +289,9 @@ export default function FFmpegGuidePage() {
                 </div>
               </div>
               <div>
-                <h3 className="font-semibold mb-2">{t("guide.tips.twopass.title")}</h3>
+                <h3 className="font-semibold mb-2">
+                  {t("guide.tips.twopass.title")}
+                </h3>
                 <p className="text-sm text-muted-foreground mb-2">
                   {t("guide.tips.twopass.desc")}
                 </p>
@@ -293,7 +318,9 @@ export default function FFmpegGuidePage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <h3 className="font-semibold mb-2">{t("guide.tips.scale.scaling")}</h3>
+                <h3 className="font-semibold mb-2">
+                  {t("guide.tips.scale.scaling")}
+                </h3>
                 <div className="rounded-md bg-muted p-4">
                   <code className="text-sm">
                     {t("guide.tips.scale.specific")}
@@ -313,7 +340,9 @@ export default function FFmpegGuidePage() {
                 </div>
               </div>
               <div>
-                <h3 className="font-semibold mb-2">{t("guide.tips.scale.aspect")}</h3>
+                <h3 className="font-semibold mb-2">
+                  {t("guide.tips.scale.aspect")}
+                </h3>
                 <div className="rounded-md bg-muted p-4">
                   <code className="text-sm">
                     ffmpeg -i input.mp4 -vf
@@ -363,9 +392,11 @@ Get-ChildItem *.mp4 | ForEach-Object {
                   {t("guide.errors.codec.title")}
                 </h3>
                 <p className="text-sm text-muted-foreground mb-2">
-                  <strong>{t("guide.errors.codec.reason")}</strong> {t("guide.errors.codec.reason.text")}
+                  <strong>{t("guide.errors.codec.reason")}</strong>{" "}
+                  {t("guide.errors.codec.reason.text")}
                   <br />
-                  <strong>{t("guide.errors.codec.solution")}</strong> {t("guide.errors.codec.solution.text")}
+                  <strong>{t("guide.errors.codec.solution")}</strong>{" "}
+                  {t("guide.errors.codec.solution.text")}
                 </p>
               </div>
               <div>
@@ -373,17 +404,23 @@ Get-ChildItem *.mp4 | ForEach-Object {
                   {t("guide.errors.permission.title")}
                 </h3>
                 <p className="text-sm text-muted-foreground mb-2">
-                  <strong>{t("guide.errors.codec.reason")}</strong> {t("guide.errors.permission.reason.text")}
+                  <strong>{t("guide.errors.codec.reason")}</strong>{" "}
+                  {t("guide.errors.permission.reason.text")}
                   <br />
-                  <strong>{t("guide.errors.codec.solution")}</strong> {t("guide.errors.permission.solution.text")}
+                  <strong>{t("guide.errors.codec.solution")}</strong>{" "}
+                  {t("guide.errors.permission.solution.text")}
                 </p>
               </div>
               <div>
-                <h3 className="font-semibold mb-2">{t("guide.errors.slow.title")}</h3>
+                <h3 className="font-semibold mb-2">
+                  {t("guide.errors.slow.title")}
+                </h3>
                 <p className="text-sm text-muted-foreground mb-2">
-                  <strong>{t("guide.errors.codec.reason")}</strong> {t("guide.errors.slow.reason.text")}
+                  <strong>{t("guide.errors.codec.reason")}</strong>{" "}
+                  {t("guide.errors.slow.reason.text")}
                   <br />
-                  <strong>{t("guide.errors.codec.solution")}</strong> {t("guide.errors.slow.solution.text")}
+                  <strong>{t("guide.errors.codec.solution")}</strong>{" "}
+                  {t("guide.errors.slow.solution.text")}
                 </p>
               </div>
               <div>
@@ -391,17 +428,23 @@ Get-ChildItem *.mp4 | ForEach-Object {
                   {t("guide.errors.large.title")}
                 </h3>
                 <p className="text-sm text-muted-foreground mb-2">
-                  <strong>{t("guide.errors.codec.reason")}</strong> {t("guide.errors.large.reason.text")}
+                  <strong>{t("guide.errors.codec.reason")}</strong>{" "}
+                  {t("guide.errors.large.reason.text")}
                   <br />
-                  <strong>{t("guide.errors.codec.solution")}</strong> {t("guide.errors.large.solution.text")}
+                  <strong>{t("guide.errors.codec.solution")}</strong>{" "}
+                  {t("guide.errors.large.solution.text")}
                 </p>
               </div>
               <div>
-                <h3 className="font-semibold mb-2">{t("guide.errors.quality.title")}</h3>
+                <h3 className="font-semibold mb-2">
+                  {t("guide.errors.quality.title")}
+                </h3>
                 <p className="text-sm text-muted-foreground mb-2">
-                  <strong>{t("guide.errors.codec.reason")}</strong> {t("guide.errors.quality.reason.text")}
+                  <strong>{t("guide.errors.codec.reason")}</strong>{" "}
+                  {t("guide.errors.quality.reason.text")}
                   <br />
-                  <strong>{t("guide.errors.codec.solution")}</strong> {t("guide.errors.quality.solution.text")}
+                  <strong>{t("guide.errors.codec.solution")}</strong>{" "}
+                  {t("guide.errors.quality.solution.text")}
                 </p>
               </div>
             </CardContent>

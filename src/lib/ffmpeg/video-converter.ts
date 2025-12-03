@@ -6,6 +6,7 @@ import {
   checkHardwareAcceleration,
   type WebCodecsProgress,
 } from "./webcodecs-converter";
+import type { TranslationFunction } from "@/lib/i18n/use-translation";
 
 export interface ConversionProgress {
   progress: number; // 0-100
@@ -71,25 +72,25 @@ export async function convertVideo(
   // WebCodecs API desteği varsa ve dosya çok büyük değilse onu kullan
   // WebCodecs büyük dosyalar için bellek sorunları yaşayabilir
   const WEBCODECS_MAX_SIZE = 200 * 1024 * 1024; // 200MB
-  const useWebCodecs = isWebCodecsSupported() && file.size <= WEBCODECS_MAX_SIZE;
-  
+  const useWebCodecs =
+    isWebCodecsSupported() && file.size <= WEBCODECS_MAX_SIZE;
+
   if (useWebCodecs) {
     try {
       const hasHardwareAccel = await checkHardwareAcceleration(options.codec);
-      
+
       onProgress?.({
         progress: 0,
         time: 0,
         message: hasHardwareAccel
-          ? t?.("conversion.startingGpu") || "GPU acceleration ile encoding başlatılıyor..."
+          ? t?.("conversion.startingGpu") ||
+            "GPU acceleration ile encoding başlatılıyor..."
           : t?.("conversion.startingCpu") || "CPU ile encoding başlatılıyor...",
       });
 
       const webCodecsOptions = {
         codec: options.codec as "h264" | "h265" | "vp9" | "av1",
-        bitrate: options.bitrate
-          ? parseBitrate(options.bitrate)
-          : undefined,
+        bitrate: options.bitrate ? parseBitrate(options.bitrate) : undefined,
         crf: options.crf,
         quality: options.quality,
         resolution: options.resolution,
@@ -122,12 +123,13 @@ export async function convertVideo(
         "WebCodecs hatası, FFmpeg.wasm'e geçiliyor:",
         webCodecsError
       );
-      
+
       // Eğer WebCodecs destekleniyorsa ama hata veriyorsa ve dosya FFmpeg.wasm limit'inin üzerindeyse
       // FFmpeg.wasm'e geçmeye çalışma, direkt hata ver
       if (file.size > FFMPEG_MAX_SIZE) {
         const size = (file.size / 1024 / 1024).toFixed(2);
-        const errorMsg = t?.("conversion.webcodecsLargeFileError", { size }) || 
+        const errorMsg =
+          t?.("conversion.webcodecsLargeFileError", { size }) ||
           `WebCodecs conversion failed for large file (${size}MB). WebCodecs API may have memory limitations. Please try with a smaller file or use command-line FFmpeg.`;
         throw new Error(errorMsg);
       }
@@ -139,7 +141,8 @@ export async function convertVideo(
   // Büyük dosyalar için uyarı (sadece FFmpeg.wasm için)
   if (file.size > FFMPEG_MAX_SIZE) {
     const size = (file.size / 1024 / 1024).toFixed(2);
-    const errorMsg = t?.("conversion.fileTooLargeDesc", { size }) || 
+    const errorMsg =
+      t?.("conversion.fileTooLargeDesc", { size }) ||
       `Dosya çok büyük (${size}MB). FFmpeg.wasm maksimum 50MB dosya boyutunu destekler. Lütfen daha küçük bir dosya seçin, WebCodecs API destekleyen tarayıcı kullanın (Chrome/Edge) veya komut satırından FFmpeg kullanın.`;
     throw new Error(errorMsg);
   }
@@ -198,7 +201,9 @@ export async function convertVideo(
               progress: Math.max(15, progress), // Minimum 15'ten başla
               time: elapsed,
               speed: speedMatch ? `${speedMatch[1]}x` : undefined,
-              message: `${t?.("conversion.encoding") || "Encoding..."} ${Math.round(progress)}%`,
+              message: `${
+                t?.("conversion.encoding") || "Encoding..."
+              } ${Math.round(progress)}%`,
             });
           }
         }
@@ -208,15 +213,20 @@ export async function convertVideo(
           if (currentFrame > lastProgressFrame) {
             lastProgressFrame = currentFrame;
             lastProgressTime = currentTime;
-            
+
             // Frame bazlı progress güncellemesi
             if (onProgress) {
-              const frameProgress = Math.min(95, 15 + (currentFrame / 1000) * 10); // Basit frame bazlı progress
+              const frameProgress = Math.min(
+                95,
+                15 + (currentFrame / 1000) * 10
+              ); // Basit frame bazlı progress
               onProgress({
                 progress: frameProgress,
                 time: elapsed,
                 speed: speedMatch ? `${speedMatch[1]}x` : undefined,
-                message: `${t?.("conversion.encoding") || "Encoding..."} Frame: ${currentFrame}`,
+                message: `${
+                  t?.("conversion.encoding") || "Encoding..."
+                } Frame: ${currentFrame}`,
               });
             }
           }
@@ -227,15 +237,20 @@ export async function convertVideo(
     ffmpeg.on("log", progressHandler);
 
     // Dosyayı yükle
-    onProgress?.({ progress: 5, time: 0, message: t?.("conversion.preparing") || "Dosya hazırlanıyor..." });
-    
+    onProgress?.({
+      progress: 5,
+      time: 0,
+      message: t?.("conversion.preparing") || "Dosya hazırlanıyor...",
+    });
+
     try {
       const fileData = await fetchFile(file);
       await ffmpeg.writeFile(inputFileName, fileData);
     } catch (fsError) {
       // FS error'ı erken yakala
       const size = (file.size / 1024 / 1024).toFixed(2);
-      const fsErrorMsg = t?.("conversion.fsError", { size }) || 
+      const fsErrorMsg =
+        t?.("conversion.fsError", { size }) ||
         `Dosya sistemi hatası (${size}MB dosya). FFmpeg.wasm bellek sınırlamaları nedeniyle bu dosyayı işleyemiyor. Lütfen daha küçük bir dosya deneyin, WebCodecs API destekleyen tarayıcı kullanın (Chrome/Edge) veya komut satırından FFmpeg kullanın.`;
       throw new Error(fsErrorMsg);
     }
@@ -290,42 +305,46 @@ export async function convertVideo(
 
     // Video filters
     const videoFilters: string[] = [];
-    
+
     // Crop
     if (options.crop) {
-      videoFilters.push(`crop=${options.crop.width}:${options.crop.height}:${options.crop.x}:${options.crop.y}`);
+      videoFilters.push(
+        `crop=${options.crop.width}:${options.crop.height}:${options.crop.x}:${options.crop.y}`
+      );
     }
-    
+
     // Deinterlace
     if (options.deinterlace) {
       videoFilters.push("yadif");
     }
-    
+
     // Denoise
     if (options.denoise) {
       videoFilters.push("hqdn3d");
     }
-    
+
     // Resolution (scale)
     if (options.resolution) {
-      videoFilters.push(`scale=${options.resolution.width}:${options.resolution.height}`);
+      videoFilters.push(
+        `scale=${options.resolution.width}:${options.resolution.height}`
+      );
     }
-    
+
     // Custom video filter
     if (options.videoFilter) {
       videoFilters.push(options.videoFilter);
     }
-    
+
     // Apply video filters
     if (videoFilters.length > 0) {
       ffmpegArgs.push("-vf", videoFilters.join(","));
     }
-    
+
     // Color space
     if (options.colorSpace) {
       ffmpegArgs.push("-colorspace", options.colorSpace);
     }
-    
+
     // Color range
     if (options.colorRange) {
       ffmpegArgs.push("-color_range", options.colorRange);
@@ -342,20 +361,27 @@ export async function convertVideo(
     }
 
     // Profile (H.264/H.265)
-    if (options.profile && (options.codec === "h264" || options.codec === "h265")) {
+    if (
+      options.profile &&
+      (options.codec === "h264" || options.codec === "h265")
+    ) {
       if (options.codec === "h264") {
         // H.264 profiles: baseline, main, high, high10, high422, high444
         ffmpegArgs.push("-profile:v", options.profile);
       } else if (options.codec === "h265") {
         // H.265 profiles: main, main10, main12, main-intra, main10-intra, etc.
         // "high" profile H.265'te yok, "main" kullan
-        const h265Profile = options.profile === "high" ? "main" : options.profile;
+        const h265Profile =
+          options.profile === "high" ? "main" : options.profile;
         ffmpegArgs.push("-profile:v", h265Profile);
       }
     }
 
     // Level (H.264/H.265)
-    if (options.level && (options.codec === "h264" || options.codec === "h265")) {
+    if (
+      options.level &&
+      (options.codec === "h264" || options.codec === "h265")
+    ) {
       ffmpegArgs.push("-level", options.level);
     }
 
@@ -394,13 +420,23 @@ export async function convertVideo(
     // Two-pass encoding
     if (options.twoPass) {
       // First pass
-      const firstPassArgs = [...ffmpegArgs, "-pass", "1", "-f", "null", "/dev/null"];
+      const firstPassArgs = [
+        ...ffmpegArgs,
+        "-pass",
+        "1",
+        "-f",
+        "null",
+        "/dev/null",
+      ];
       // Note: FFmpeg.wasm doesn't support two-pass well, so we'll skip it for now
       // This is a placeholder for future implementation
     }
 
     // Tune (H.264/H.265)
-    if (options.tune && (options.codec === "h264" || options.codec === "h265")) {
+    if (
+      options.tune &&
+      (options.codec === "h264" || options.codec === "h265")
+    ) {
       ffmpegArgs.push("-tune", options.tune);
     }
 
@@ -413,22 +449,34 @@ export async function convertVideo(
     }
 
     // B-frames (H.264/H.265)
-    if (options.bframes !== undefined && (options.codec === "h264" || options.codec === "h265")) {
+    if (
+      options.bframes !== undefined &&
+      (options.codec === "h264" || options.codec === "h265")
+    ) {
       ffmpegArgs.push("-bf", options.bframes.toString());
     }
 
     // Reference frames (H.264/H.265)
-    if (options.refFrames !== undefined && (options.codec === "h264" || options.codec === "h265")) {
+    if (
+      options.refFrames !== undefined &&
+      (options.codec === "h264" || options.codec === "h265")
+    ) {
       ffmpegArgs.push("-refs", options.refFrames.toString());
     }
 
     // Motion estimation method
-    if (options.meMethod && (options.codec === "h264" || options.codec === "h265")) {
+    if (
+      options.meMethod &&
+      (options.codec === "h264" || options.codec === "h265")
+    ) {
       ffmpegArgs.push("-me_method", options.meMethod);
     }
 
     // Subpixel motion estimation
-    if (options.subMe !== undefined && (options.codec === "h264" || options.codec === "h265")) {
+    if (
+      options.subMe !== undefined &&
+      (options.codec === "h264" || options.codec === "h265")
+    ) {
       ffmpegArgs.push("-subq", options.subMe.toString());
     }
 
@@ -436,24 +484,39 @@ export async function convertVideo(
     ffmpegArgs.push(outputFileName);
 
     // Encoding'i başlat
-    onProgress?.({ progress: 15, time: 0, message: t?.("conversion.encoding") || "Encoding başladı..." });
-    
+    onProgress?.({
+      progress: 15,
+      time: 0,
+      message: t?.("conversion.encoding") || "Encoding başladı...",
+    });
+
     // FFmpeg exec'i başlat (bu asenkron olarak çalışır ve progress handler'ı tetikler)
     const execPromise = ffmpeg.exec(ffmpegArgs);
-    
+
     // Progress handler'ın çalışması için kısa bir bekleme
-    await new Promise(resolve => setTimeout(resolve, 100));
-    
+    await new Promise((resolve) => setTimeout(resolve, 100));
+
     // Encoding tamamlanana kadar bekle
     await execPromise;
 
     // Sonuç dosyasını oku
-    onProgress?.({ progress: 95, time: 0, message: t?.("conversion.preparing") || "Dosya hazırlanıyor..." });
+    onProgress?.({
+      progress: 95,
+      time: 0,
+      message: t?.("conversion.preparing") || "Dosya hazırlanıyor...",
+    });
     const data = await ffmpeg.readFile(outputFileName);
-    
+
     // Çıktı dosyası kontrolü - eğer 0 byte ise hata ver
-    if (!data || (data instanceof Uint8Array && data.length === 0) || (typeof data === "string" && data.length === 0)) {
-      throw new Error(t?.("conversion.emptyOutput") || "Encoding başarısız oldu - çıktı dosyası boş. Lütfen ayarları kontrol edin (özellikle codec ve profile ayarlarını) ve tekrar deneyin.");
+    if (
+      !data ||
+      (data instanceof Uint8Array && data.length === 0) ||
+      (typeof data === "string" && data.length === 0)
+    ) {
+      throw new Error(
+        t?.("conversion.emptyOutput") ||
+          "Encoding başarısız oldu - çıktı dosyası boş. Lütfen ayarları kontrol edin (özellikle codec ve profile ayarlarını) ve tekrar deneyin."
+      );
     }
 
     // Cleanup
@@ -467,7 +530,11 @@ export async function convertVideo(
     // Event handler'ı kaldır
     ffmpeg.off("log", progressHandler);
 
-    onProgress?.({ progress: 100, time: 0, message: t?.("conversion.completed") || "Tamamlandı!" });
+    onProgress?.({
+      progress: 100,
+      time: 0,
+      message: t?.("conversion.completed") || "Tamamlandı!",
+    });
 
     // Blob oluştur - FileData'ı BlobPart'a dönüştür
     // FileData can be Uint8Array or string, we need to handle both
@@ -501,16 +568,22 @@ export async function convertVideo(
     }
 
     const errorMessage = error instanceof Error ? error.message : String(error);
-    
+
     // FS error'ı özel olarak handle et
-    if (errorMessage.includes("FS error") || errorMessage.includes("ErrnoError")) {
+    if (
+      errorMessage.includes("FS error") ||
+      errorMessage.includes("ErrnoError")
+    ) {
       const size = (file.size / 1024 / 1024).toFixed(2);
-      const fsErrorMsg = t?.("conversion.fsError", { size }) || 
+      const fsErrorMsg =
+        t?.("conversion.fsError", { size }) ||
         `Dosya sistemi hatası (${size}MB dosya). FFmpeg.wasm bellek sınırlamaları nedeniyle bu dosyayı işleyemiyor. Lütfen daha küçük bir dosya deneyin, WebCodecs API destekleyen tarayıcı kullanın (Chrome/Edge) veya komut satırından FFmpeg kullanın.`;
       throw new Error(fsErrorMsg);
     }
-    
+
     // Diğer hatalar için genel mesaj
-    throw new Error(`${t?.("conversion.error") || "Video dönüştürme hatası"}: ${errorMessage}`);
+    throw new Error(
+      `${t?.("conversion.error") || "Video dönüştürme hatası"}: ${errorMessage}`
+    );
   }
 }

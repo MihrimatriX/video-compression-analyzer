@@ -2,10 +2,9 @@
 
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Play, Pause, Volume2, VolumeX, Maximize2, RotateCcw } from "lucide-react";
+import { X, Play, Pause, Volume2, VolumeX, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { useVideoStore } from "@/lib/store/video-store";
 import { useTranslation } from "@/lib/i18n/use-translation";
 import type { VideoFile } from "@/lib/types/video";
 
@@ -15,7 +14,11 @@ interface VideoComparisonProps {
   onClose: () => void;
 }
 
-export function VideoComparison({ video1, video2, onClose }: VideoComparisonProps) {
+export function VideoComparison({
+  video1,
+  video2,
+  onClose,
+}: VideoComparisonProps) {
   const { t } = useTranslation();
   const video1Ref = useRef<HTMLVideoElement>(null);
   const video2Ref = useRef<HTMLVideoElement>(null);
@@ -50,7 +53,8 @@ export function VideoComparison({ video1, video2, onClose }: VideoComparisonProp
         }
       };
       video1El.addEventListener("loadedmetadata", handleLoadedMetadata);
-      return () => video1El.removeEventListener("loadedmetadata", handleLoadedMetadata);
+      return () =>
+        video1El.removeEventListener("loadedmetadata", handleLoadedMetadata);
     }
   }, [video1Url]);
 
@@ -212,11 +216,16 @@ export function VideoComparison({ video1, video2, onClose }: VideoComparisonProp
                   className="absolute top-2 right-2 bg-black/70 hover:bg-black/90 text-white"
                   onClick={handleMute1}
                 >
-                  {isMuted1 ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
+                  {isMuted1 ? (
+                    <VolumeX className="h-4 w-4" />
+                  ) : (
+                    <Volume2 className="h-4 w-4" />
+                  )}
                 </Button>
               </div>
               <div className="p-2 text-xs text-muted-foreground">
-                {video1.analysis?.metadata.width}x{video1.analysis?.metadata.height} •{" "}
+                {video1.analysis?.metadata.width}x
+                {video1.analysis?.metadata.height} •{" "}
                 {video1.analysis?.metadata.codecName}
               </div>
             </Card>
@@ -246,11 +255,16 @@ export function VideoComparison({ video1, video2, onClose }: VideoComparisonProp
                   className="absolute top-2 right-2 bg-black/70 hover:bg-black/90 text-white"
                   onClick={handleMute2}
                 >
-                  {isMuted2 ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
+                  {isMuted2 ? (
+                    <VolumeX className="h-4 w-4" />
+                  ) : (
+                    <Volume2 className="h-4 w-4" />
+                  )}
                 </Button>
               </div>
               <div className="p-2 text-xs text-muted-foreground">
-                {video2.analysis?.metadata.width}x{video2.analysis?.metadata.height} •{" "}
+                {video2.analysis?.metadata.width}x
+                {video2.analysis?.metadata.height} •{" "}
                 {video2.analysis?.metadata.codecName}
               </div>
             </Card>
@@ -260,7 +274,9 @@ export function VideoComparison({ video1, video2, onClose }: VideoComparisonProp
           <div className="p-4 border-t bg-muted/30 space-y-3">
             {/* Progress Bar */}
             <div className="flex items-center gap-2">
-              <span className="text-xs text-muted-foreground w-16">{formatTime(currentTime)}</span>
+              <span className="text-xs text-muted-foreground w-16">
+                {formatTime(currentTime)}
+              </span>
               <input
                 type="range"
                 min="0"
@@ -269,7 +285,9 @@ export function VideoComparison({ video1, video2, onClose }: VideoComparisonProp
                 onChange={(e) => handleSeek(Number(e.target.value))}
                 className="flex-1 h-2 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
               />
-              <span className="text-xs text-muted-foreground w-16">{formatTime(duration)}</span>
+              <span className="text-xs text-muted-foreground w-16">
+                {formatTime(duration)}
+              </span>
             </div>
 
             {/* Control Buttons */}
@@ -278,8 +296,17 @@ export function VideoComparison({ video1, video2, onClose }: VideoComparisonProp
                 <RotateCcw className="h-4 w-4 mr-2" />
                 Sıfırla
               </Button>
-              <Button variant="default" size="sm" onClick={handlePlayPause} className="gap-2">
-                {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
+              <Button
+                variant="default"
+                size="sm"
+                onClick={handlePlayPause}
+                className="gap-2"
+              >
+                {isPlaying ? (
+                  <Pause className="h-4 w-4" />
+                ) : (
+                  <Play className="h-4 w-4" />
+                )}
                 {isPlaying ? "Duraklat" : "Oynat"}
               </Button>
             </div>
@@ -289,4 +316,3 @@ export function VideoComparison({ video1, video2, onClose }: VideoComparisonProp
     </AnimatePresence>
   );
 }
-

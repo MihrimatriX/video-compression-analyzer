@@ -14,20 +14,44 @@ import {
   Monitor,
   Zap,
 } from "lucide-react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useTranslation } from "@/lib/i18n/use-translation";
-import { convertVideo, type ConversionProgress } from "@/lib/ffmpeg/video-converter";
+import {
+  convertVideo,
+  type ConversionProgress,
+} from "@/lib/ffmpeg/video-converter";
 import {
   isWebCodecsSupported,
   checkHardwareAcceleration,
 } from "@/lib/ffmpeg/webcodecs-converter";
-import { formatFileSize, formatDuration, formatBitrate } from "@/lib/utils/video-detector";
+import {
+  formatFileSize,
+  formatDuration,
+  formatBitrate,
+} from "@/lib/utils/video-detector";
+
+// WebKit-specific video properties
+interface HTMLVideoElementWithWebKit extends HTMLVideoElement {
+  webkitDecodedFrameCount?: number;
+}
 
 interface VideoMetadata {
   duration: number;
@@ -68,7 +92,10 @@ export default function ConverterPage() {
   useEffect(() => {
     if (codec === "h265" && profile === "high") {
       setProfile("main");
-    } else if (codec === "h264" && (profile === "main" || profile === "main10" || profile === "main12")) {
+    } else if (
+      codec === "h264" &&
+      (profile === "main" || profile === "main10" || profile === "main12")
+    ) {
       setProfile("high");
     }
   }, [codec]);
@@ -113,7 +140,7 @@ export default function ConverterPage() {
     }
 
     const videoUrl = URL.createObjectURL(file);
-    
+
     // Video preview URL'ini set et
     setVideoPreview(videoUrl);
 
@@ -160,14 +187,18 @@ export default function ConverterPage() {
           canvas.width = video.videoWidth;
           canvas.height = video.videoHeight;
           ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-          
-          canvas.toBlob((blob) => {
-            if (blob) {
-              const thumbnailUrl = URL.createObjectURL(blob);
-              // Thumbnail'ı video preview olarak kullan (opsiyonel)
-              // setVideoPreview(thumbnailUrl);
-            }
-          }, "image/jpeg", 0.9);
+
+          canvas.toBlob(
+            (blob) => {
+              if (blob) {
+                const thumbnailUrl = URL.createObjectURL(blob);
+                // Thumbnail'ı video preview olarak kullan (opsiyonel)
+                // setVideoPreview(thumbnailUrl);
+              }
+            },
+            "image/jpeg",
+            0.9
+          );
         }
       } catch (error) {
         console.warn("Thumbnail oluşturulamadı:", error);
@@ -188,9 +219,11 @@ export default function ConverterPage() {
       // Try to detect framerate
       let detectedFramerate = 30;
       try {
-        // @ts-ignore - video may have webkitDecodedFrameCount
-        if (video.webkitDecodedFrameCount && video.duration) {
-          detectedFramerate = Math.round(video.webkitDecodedFrameCount / video.duration);
+        const webkitVideo = video as HTMLVideoElementWithWebKit;
+        if (webkitVideo.webkitDecodedFrameCount && video.duration) {
+          detectedFramerate = Math.round(
+            webkitVideo.webkitDecodedFrameCount / video.duration
+          );
         }
       } catch (e) {
         // Fallback to default
@@ -211,7 +244,7 @@ export default function ConverterPage() {
         setHeight((prev) => prev || height.toString());
       }
       setFramerate((prev) => prev || detectedFramerate.toString());
-      
+
       // Thumbnail oluştur
       createThumbnail();
     };
@@ -221,7 +254,7 @@ export default function ConverterPage() {
       console.error("Video metadata extraction failed:", e);
       console.error("Video error:", video.error);
     });
-    
+
     // Video yüklemesini başlat (sadece bir kez)
     if (video.readyState === 0) {
       video.load();
@@ -234,22 +267,11 @@ export default function ConverterPage() {
     };
   }, [file]);
 
-  const handleFileSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = e.target.files?.[0];
-    if (selectedFile) {
-      setFile(selectedFile);
-      setError(null);
-      setOutputBlob(null);
-      setProgress(null);
-    }
-  }, []);
-
-  const handleDrop = useCallback(
-    (e: React.DragEvent) => {
-      e.preventDefault();
-      const droppedFile = e.dataTransfer.files[0];
-      if (droppedFile && droppedFile.type.startsWith("video/")) {
-        setFile(droppedFile);
+  const handleFileSelect = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const selectedFile = e.target.files?.[0];
+      if (selectedFile) {
+        setFile(selectedFile);
         setError(null);
         setOutputBlob(null);
         setProgress(null);
@@ -257,6 +279,17 @@ export default function ConverterPage() {
     },
     []
   );
+
+  const handleDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    const droppedFile = e.dataTransfer.files[0];
+    if (droppedFile && droppedFile.type.startsWith("video/")) {
+      setFile(droppedFile);
+      setError(null);
+      setOutputBlob(null);
+      setProgress(null);
+    }
+  }, []);
 
   const handleConvert = async () => {
     if (!file) return;
@@ -281,7 +314,9 @@ export default function ConverterPage() {
         pixelFormat: pixelFormat || "yuv420p",
         profile: profile || undefined,
         level: level || undefined,
-        keyframeInterval: keyframeInterval ? parseInt(keyframeInterval) : undefined,
+        keyframeInterval: keyframeInterval
+          ? parseInt(keyframeInterval)
+          : undefined,
         twoPass: twoPass || undefined,
         tune: tune || undefined,
         threads: threads ? parseInt(threads) : undefined,
@@ -296,19 +331,27 @@ export default function ConverterPage() {
         videoFilter: videoFilter || undefined,
         deinterlace: deinterlace || undefined,
         denoise: denoise || undefined,
-        crop: (cropWidth && cropHeight) ? {
-          width: parseInt(cropWidth),
-          height: parseInt(cropHeight),
-          x: cropX ? parseInt(cropX) : 0,
-          y: cropY ? parseInt(cropY) : 0,
-        } : undefined,
+        crop:
+          cropWidth && cropHeight
+            ? {
+                width: parseInt(cropWidth),
+                height: parseInt(cropHeight),
+                x: cropX ? parseInt(cropX) : 0,
+                y: cropY ? parseInt(cropY) : 0,
+              }
+            : undefined,
         colorSpace: colorSpace || undefined,
         colorRange: colorRange || undefined,
       };
 
-      const blob = await convertVideo(file, options, (prog) => {
-        setProgress(prog);
-      }, t);
+      const blob = await convertVideo(
+        file,
+        options,
+        (prog) => {
+          setProgress(prog);
+        },
+        t
+      );
 
       setOutputBlob(blob);
       setProgress({
@@ -445,7 +488,9 @@ export default function ConverterPage() {
           <Card>
             <CardHeader>
               <CardTitle>{t("converter.uploadTitle")}</CardTitle>
-              <CardDescription>{t("converter.uploadDescription")}</CardDescription>
+              <CardDescription>
+                {t("converter.uploadDescription")}
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               {!file ? (
@@ -484,13 +529,13 @@ export default function ConverterPage() {
                         preload="auto"
                         playsInline
                         muted
-                        style={{ 
-                          width: '100%', 
-                          height: '100%',
-                          display: 'block',
-                          backgroundColor: '#000',
-                          minHeight: '200px',
-                          objectFit: 'contain'
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          display: "block",
+                          backgroundColor: "#000",
+                          minHeight: "200px",
+                          objectFit: "contain",
                         }}
                         onError={(e) => {
                           console.error("Video preview error:", e);
@@ -501,7 +546,7 @@ export default function ConverterPage() {
                             readyState: target.readyState,
                             src: target.src,
                             videoWidth: target.videoWidth,
-                            videoHeight: target.videoHeight
+                            videoHeight: target.videoHeight,
                           });
                         }}
                         onLoadedMetadata={(e) => {
@@ -510,7 +555,7 @@ export default function ConverterPage() {
                             width: target.videoWidth,
                             height: target.videoHeight,
                             duration: target.duration,
-                            readyState: target.readyState
+                            readyState: target.readyState,
                           });
                         }}
                         onLoadedData={(e) => {
@@ -518,10 +563,14 @@ export default function ConverterPage() {
                           console.log("Video data loaded:", {
                             readyState: target.readyState,
                             videoWidth: target.videoWidth,
-                            videoHeight: target.videoHeight
+                            videoHeight: target.videoHeight,
                           });
                           // Video data yüklendiğinde ilk frame'i göster
-                          if (target.videoWidth > 0 && target.videoHeight > 0 && target.readyState >= 2) {
+                          if (
+                            target.videoWidth > 0 &&
+                            target.videoHeight > 0 &&
+                            target.readyState >= 2
+                          ) {
                             target.currentTime = 0.1;
                           }
                         }}
@@ -529,7 +578,7 @@ export default function ConverterPage() {
                           const target = e.target as HTMLVideoElement;
                           console.log("Video can play:", {
                             videoWidth: target.videoWidth,
-                            videoHeight: target.videoHeight
+                            videoHeight: target.videoHeight,
                           });
                         }}
                       />
@@ -540,7 +589,9 @@ export default function ConverterPage() {
                   {/* File Info */}
                   <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium truncate">{file.name}</p>
+                      <p className="text-sm font-medium truncate">
+                        {file.name}
+                      </p>
                       <p className="text-xs text-muted-foreground">
                         {formatFileSize(file.size)}
                       </p>
@@ -622,7 +673,9 @@ export default function ConverterPage() {
                   </div>
                   {currentCodecInfo.name}
                 </CardTitle>
-                <CardDescription>{currentCodecInfo.description}</CardDescription>
+                <CardDescription>
+                  {currentCodecInfo.description}
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-2">
@@ -651,27 +704,44 @@ export default function ConverterPage() {
                 <Settings2 className="h-5 w-5" />
                 {t("converter.settingsTitle")}
               </CardTitle>
-              <CardDescription>{t("converter.settingsDescription")}</CardDescription>
+              <CardDescription>
+                {t("converter.settingsDescription")}
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <Tabs defaultValue="basic" className="w-full">
                 <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="basic">{t("converter.basic")}</TabsTrigger>
-                  <TabsTrigger value="advanced">{t("converter.advanced")}</TabsTrigger>
+                  <TabsTrigger value="basic">
+                    {t("converter.basic")}
+                  </TabsTrigger>
+                  <TabsTrigger value="advanced">
+                    {t("converter.advanced")}
+                  </TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="basic" className="space-y-4 mt-4">
                   <div className="space-y-2">
                     <Label>{t("video.codec")}</Label>
-                    <Select value={codec} onValueChange={(v) => setCodec(v as any)}>
+                    <Select
+                      value={codec}
+                      onValueChange={(v) => setCodec(v as any)}
+                    >
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="h264">{t("settings.codec.h264.title")}</SelectItem>
-                        <SelectItem value="h265">{t("settings.codec.h265.title")}</SelectItem>
-                        <SelectItem value="vp9">{t("settings.codec.vp9.title")}</SelectItem>
-                        <SelectItem value="av1">{t("settings.codec.av1.title")}</SelectItem>
+                        <SelectItem value="h264">
+                          {t("settings.codec.h264.title")}
+                        </SelectItem>
+                        <SelectItem value="h265">
+                          {t("settings.codec.h265.title")}
+                        </SelectItem>
+                        <SelectItem value="vp9">
+                          {t("settings.codec.vp9.title")}
+                        </SelectItem>
+                        <SelectItem value="av1">
+                          {t("settings.codec.av1.title")}
+                        </SelectItem>
                       </SelectContent>
                     </Select>
                     {file && (
@@ -687,11 +757,16 @@ export default function ConverterPage() {
                             {t("settings.advantages")}
                           </p>
                           <ul className="space-y-0.5 pl-4">
-                            {currentCodecInfo.advantages.slice(0, 2).map((adv, idx) => (
-                              <li key={idx} className="text-xs text-muted-foreground">
-                                • {adv}
-                              </li>
-                            ))}
+                            {currentCodecInfo.advantages
+                              .slice(0, 2)
+                              .map((adv, idx) => (
+                                <li
+                                  key={idx}
+                                  className="text-xs text-muted-foreground"
+                                >
+                                  • {adv}
+                                </li>
+                              ))}
                           </ul>
                         </div>
                       </div>
@@ -736,7 +811,9 @@ export default function ConverterPage() {
                     </Select>
                     <div className="p-2 bg-muted/50 rounded-md">
                       <p className="text-xs text-muted-foreground">
-                        {preset === "ultrafast" || preset === "superfast" || preset === "veryfast"
+                        {preset === "ultrafast" ||
+                        preset === "superfast" ||
+                        preset === "veryfast"
                           ? t("converter.preset.ultrafast.desc")
                           : preset === "faster" || preset === "fast"
                           ? t("converter.preset.fast.desc")
@@ -863,9 +940,15 @@ export default function ConverterPage() {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="aac">{t("converter.audioCodec.aac")}</SelectItem>
-                        <SelectItem value="libopus">{t("converter.audioCodec.opus")}</SelectItem>
-                        <SelectItem value="mp3">{t("converter.audioCodec.mp3")}</SelectItem>
+                        <SelectItem value="aac">
+                          {t("converter.audioCodec.aac")}
+                        </SelectItem>
+                        <SelectItem value="libopus">
+                          {t("converter.audioCodec.opus")}
+                        </SelectItem>
+                        <SelectItem value="mp3">
+                          {t("converter.audioCodec.mp3")}
+                        </SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -903,10 +986,18 @@ export default function ConverterPage() {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="yuv420p">yuv420p - {t("converter.pixelFormat.yuv420p")}</SelectItem>
-                        <SelectItem value="yuv422p">yuv422p - {t("converter.pixelFormat.yuv422p")}</SelectItem>
-                        <SelectItem value="yuv444p">yuv444p - {t("converter.pixelFormat.yuv444p")}</SelectItem>
-                        <SelectItem value="nv12">nv12 - {t("converter.pixelFormat.nv12")}</SelectItem>
+                        <SelectItem value="yuv420p">
+                          yuv420p - {t("converter.pixelFormat.yuv420p")}
+                        </SelectItem>
+                        <SelectItem value="yuv422p">
+                          yuv422p - {t("converter.pixelFormat.yuv422p")}
+                        </SelectItem>
+                        <SelectItem value="yuv444p">
+                          yuv444p - {t("converter.pixelFormat.yuv444p")}
+                        </SelectItem>
+                        <SelectItem value="nv12">
+                          nv12 - {t("converter.pixelFormat.nv12")}
+                        </SelectItem>
                       </SelectContent>
                     </Select>
                     <p className="text-xs text-muted-foreground">
@@ -925,15 +1016,27 @@ export default function ConverterPage() {
                           <SelectContent>
                             {codec === "h264" ? (
                               <>
-                                <SelectItem value="baseline">baseline - {t("converter.profile.baseline")}</SelectItem>
-                                <SelectItem value="main">main - {t("converter.profile.main")}</SelectItem>
-                                <SelectItem value="high">high - {t("converter.profile.high")}</SelectItem>
+                                <SelectItem value="baseline">
+                                  baseline - {t("converter.profile.baseline")}
+                                </SelectItem>
+                                <SelectItem value="main">
+                                  main - {t("converter.profile.main")}
+                                </SelectItem>
+                                <SelectItem value="high">
+                                  high - {t("converter.profile.high")}
+                                </SelectItem>
                               </>
                             ) : (
                               <>
-                                <SelectItem value="main">main - {t("converter.profile.main")}</SelectItem>
-                                <SelectItem value="main10">main10 - {t("converter.profile.main10")}</SelectItem>
-                                <SelectItem value="main12">main12 - {t("converter.profile.main12")}</SelectItem>
+                                <SelectItem value="main">
+                                  main - {t("converter.profile.main")}
+                                </SelectItem>
+                                <SelectItem value="main10">
+                                  main10 - {t("converter.profile.main10")}
+                                </SelectItem>
+                                <SelectItem value="main12">
+                                  main12 - {t("converter.profile.main12")}
+                                </SelectItem>
                               </>
                             )}
                           </SelectContent>
@@ -1033,7 +1136,9 @@ export default function ConverterPage() {
           {error && (
             <Card className="border-destructive">
               <CardHeader>
-                <CardTitle className="text-destructive">{t("conversion.error")}</CardTitle>
+                <CardTitle className="text-destructive">
+                  {t("conversion.error")}
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-muted-foreground">{error}</p>
@@ -1046,7 +1151,9 @@ export default function ConverterPage() {
             <Card>
               <CardHeader>
                 <CardTitle>{t("converter.output")}</CardTitle>
-                <CardDescription>{formatFileSize(outputBlob.size)}</CardDescription>
+                <CardDescription>
+                  {formatFileSize(outputBlob.size)}
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <Button onClick={handleDownload} className="w-full" size="lg">

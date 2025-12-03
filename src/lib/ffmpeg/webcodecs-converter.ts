@@ -57,7 +57,7 @@ export async function checkHardwareAcceleration(
     const support = await VideoEncoder.isConfigSupported(config);
     encoder.close();
 
-    return support.supported;
+    return support.supported ?? false;
   } catch {
     return false;
   }
@@ -148,9 +148,10 @@ export async function convertWithWebCodecs(
             time: elapsed,
             framesEncoded,
             totalFrames: estimatedTotalFrames,
-            speed: elapsed > 0
-              ? `${(framesEncoded / elapsed / framerate).toFixed(1)}x`
-              : undefined,
+            speed:
+              elapsed > 0
+                ? `${(framesEncoded / elapsed / framerate).toFixed(1)}x`
+                : undefined,
             message: `Encoding... ${Math.round(progress)}%`,
           });
         }
@@ -167,7 +168,8 @@ export async function convertWithWebCodecs(
       height,
       bitrate: options.bitrate || 5000000,
       framerate,
-      hardwareAcceleration: options.hardwareAcceleration || "prefer",
+      hardwareAcceleration: (options.hardwareAcceleration ||
+        "prefer") as HardwareAcceleration,
     };
 
     if (options.crf !== undefined) {
@@ -222,7 +224,12 @@ export async function convertWithWebCodecs(
     let currentTime = 0;
     const frameDuration = 1 / framerate;
 
-    onProgress?.({ progress: 5, time: 0, framesEncoded: 0, message: "Encoding başlatılıyor..." });
+    onProgress?.({
+      progress: 5,
+      time: 0,
+      framesEncoded: 0,
+      message: "Encoding başlatılıyor...",
+    });
 
     while (currentTime < duration) {
       video.currentTime = currentTime;
@@ -237,7 +244,7 @@ export async function convertWithWebCodecs(
             duration: frameDuration * 1_000_000,
           });
 
-          if (videoEncoder.encodeState === "configured") {
+          if (videoEncoder.state === "configured") {
             videoEncoder.encode(videoFrame);
           }
 
@@ -278,7 +285,10 @@ export async function convertWithWebCodecs(
     }
 
     const blob = new Blob([result], {
-      type: options.codec === "vp9" || options.codec === "av1" ? "video/webm" : "video/mp4",
+      type:
+        options.codec === "vp9" || options.codec === "av1"
+          ? "video/webm"
+          : "video/mp4",
     });
 
     onProgress?.({
@@ -295,9 +305,7 @@ export async function convertWithWebCodecs(
 
     return blob;
   } catch (error) {
-    const errorMessage =
-      error instanceof Error ? error.message : String(error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
     throw new Error(`WebCodecs conversion hatası: ${errorMessage}`);
   }
 }
-

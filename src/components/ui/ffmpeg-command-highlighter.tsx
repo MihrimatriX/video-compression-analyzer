@@ -16,7 +16,7 @@ export function FFmpegCommandHighlighter({
 }: FFmpegCommandHighlighterProps) {
   // Parametreleri parse et ve renklendir
   const parts = command.split(/(\s+)/);
-  
+
   return (
     <code className={cn("text-[11px] break-all", className)}>
       {parts.map((part, index) => {
@@ -24,16 +24,19 @@ export function FFmpegCommandHighlighter({
         if (/^\s+$/.test(part)) {
           return <span key={index}>{part}</span>;
         }
-        
+
         // Video codec parametreleri
         if (part === "-c:v" || part === "-c:a") {
           return (
-            <span key={index} className="text-blue-600 dark:text-blue-400 font-semibold">
+            <span
+              key={index}
+              className="text-blue-600 dark:text-blue-400 font-semibold"
+            >
               {part}
             </span>
           );
         }
-        
+
         // Codec değerleri
         if (
           part.startsWith("libaom-av1") ||
@@ -47,21 +50,32 @@ export function FFmpegCommandHighlighter({
           part.startsWith("ac3")
         ) {
           return (
-            <span key={index} className="text-purple-600 dark:text-purple-400 font-medium">
+            <span
+              key={index}
+              className="text-purple-600 dark:text-purple-400 font-medium"
+            >
               {part}
             </span>
           );
         }
-        
+
         // CRF, CQ, bitrate parametreleri
-        if (part === "-crf" || part === "-cq" || part === "-b:v" || part === "-b:a") {
+        if (
+          part === "-crf" ||
+          part === "-cq" ||
+          part === "-b:v" ||
+          part === "-b:a"
+        ) {
           return (
-            <span key={index} className="text-green-600 dark:text-green-400 font-semibold">
+            <span
+              key={index}
+              className="text-green-600 dark:text-green-400 font-semibold"
+            >
               {part}
             </span>
           );
         }
-        
+
         // Değerler (sayılar)
         if (/^-?\d+(\.\d+)?(k|m|K|M)?$/.test(part)) {
           return (
@@ -70,16 +84,19 @@ export function FFmpegCommandHighlighter({
             </span>
           );
         }
-        
+
         // Preset ve pixel format
         if (part === "-preset" || part === "-pix_fmt" || part === "-vf") {
           return (
-            <span key={index} className="text-cyan-600 dark:text-cyan-400 font-semibold">
+            <span
+              key={index}
+              className="text-cyan-600 dark:text-cyan-400 font-semibold"
+            >
               {part}
             </span>
           );
         }
-        
+
         // Pixel format değerleri
         if (
           part.includes("yuv") ||
@@ -92,7 +109,7 @@ export function FFmpegCommandHighlighter({
             </span>
           );
         }
-        
+
         // Diğer parametreler
         if (part.startsWith("-")) {
           return (
@@ -101,11 +118,10 @@ export function FFmpegCommandHighlighter({
             </span>
           );
         }
-        
+
         // Normal metin
         return <span key={index}>{part}</span>;
       })}
     </code>
   );
 }
-

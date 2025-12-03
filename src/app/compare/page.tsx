@@ -747,12 +747,20 @@ export default function ComparePage() {
         </div>
       </div>
 
-      <div className={!selectedVideo1 || !selectedVideo2 ? "container mx-auto max-w-5xl px-4 py-6" : "w-full"}>
+      <div
+        className={
+          !selectedVideo1 || !selectedVideo2
+            ? "container mx-auto max-w-5xl px-4 py-6"
+            : "w-full"
+        }
+      >
         {!selectedVideo1 || !selectedVideo2 ? (
           // Video Selection
           <div className="space-y-6">
             <div className="text-center space-y-2">
-              <h2 className="text-xl sm:text-2xl font-bold">{t("compare.selectVideos")}</h2>
+              <h2 className="text-xl sm:text-2xl font-bold">
+                {t("compare.selectVideos")}
+              </h2>
               <p className="text-sm text-muted-foreground">
                 {t("compare.selectDescription")}
               </p>
@@ -773,7 +781,9 @@ export default function ComparePage() {
                 <input {...getInputProps1()} />
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-lg font-semibold">{t("compare.video1")}</h3>
+                    <h3 className="text-lg font-semibold">
+                      {t("compare.video1")}
+                    </h3>
                     {selectedVideo1 && (
                       <Button
                         variant="ghost"
@@ -872,7 +882,9 @@ export default function ComparePage() {
                 <input {...getInputProps2()} />
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-lg font-semibold">{t("compare.video2")}</h3>
+                    <h3 className="text-lg font-semibold">
+                      {t("compare.video2")}
+                    </h3>
                     {selectedVideo2 && (
                       <Button
                         variant="ghost"
@@ -1123,7 +1135,9 @@ export default function ComparePage() {
                   <div
                     className="w-full h-full flex items-center justify-center"
                     style={{
-                      transform: `scale(${zoom1}) translate(${pan1.x / zoom1}px, ${pan1.y / zoom1}px)`,
+                      transform: `scale(${zoom1}) translate(${
+                        pan1.x / zoom1
+                      }px, ${pan1.y / zoom1}px)`,
                       transformOrigin: "center center",
                     }}
                   >
@@ -1142,13 +1156,18 @@ export default function ComparePage() {
                           if (video.duration) setDuration(video.duration);
                         }}
                         onError={(e) => {
-                          console.error("Video 1 hatası:", e.currentTarget.error);
+                          console.error(
+                            "Video 1 hatası:",
+                            e.currentTarget.error
+                          );
                         }}
                       />
                     ) : (
-                      <div className="text-white/50 text-sm">Video yükleniyor...</div>
-                    )}
+                      <div className="text-white/50 text-sm">
+                        Video yükleniyor...
                       </div>
+                    )}
+                  </div>
                   {/* Video İsmi */}
                   <div className="absolute bottom-4 left-4 bg-black/70 text-white px-3 py-1.5 rounded-md text-sm font-medium backdrop-blur-sm">
                     {selectedVideo1Name || "Video 1"}
@@ -1168,26 +1187,26 @@ export default function ComparePage() {
               >
                 {/* Görünür çubuk */}
                 <div className="absolute inset-y-0 left-1/2 -translate-x-1/2 w-1 bg-white/30 group-hover:bg-primary group-hover:w-1.5 transition-all duration-200" />
-                
+
                 {/* Ortadaki sürükleme tutamağı */}
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center">
                   <div className="bg-white/90 dark:bg-gray-800 rounded-full p-1.5 shadow-lg border border-white/20 group-hover:scale-110 transition-transform duration-200">
-                    <svg 
-                      className="w-4 h-4 text-gray-600 dark:text-gray-300" 
-                      fill="none" 
-                      viewBox="0 0 24 24" 
+                    <svg
+                      className="w-4 h-4 text-gray-600 dark:text-gray-300"
+                      fill="none"
+                      viewBox="0 0 24 24"
                       stroke="currentColor"
                     >
-                      <path 
-                        strokeLinecap="round" 
-                        strokeLinejoin="round" 
-                        strokeWidth={2} 
-                        d="M8 9l4-4 4 4m0 6l-4 4-4-4" 
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M8 9l4-4 4 4m0 6l-4 4-4-4"
                       />
                     </svg>
+                  </div>
                 </div>
-                </div>
-                
+
                 {/* Üst ve alt çizgiler */}
                 <div className="absolute top-4 left-1/2 -translate-x-1/2 w-0.5 h-8 bg-white/50 rounded-full" />
                 <div className="absolute bottom-4 left-1/2 -translate-x-1/2 w-0.5 h-8 bg-white/50 rounded-full" />
@@ -1212,7 +1231,9 @@ export default function ComparePage() {
                   <div
                     className="w-full h-full flex items-center justify-center"
                     style={{
-                      transform: `scale(${zoom2}) translate(${pan2.x / zoom2}px, ${pan2.y / zoom2}px)`,
+                      transform: `scale(${zoom2}) translate(${
+                        pan2.x / zoom2
+                      }px, ${pan2.y / zoom2}px)`,
                       transformOrigin: "center center",
                     }}
                   >
@@ -1228,16 +1249,22 @@ export default function ComparePage() {
                         className="w-full h-full object-contain"
                         onLoadedMetadata={(e) => {
                           const video = e.currentTarget;
-                          if (video.duration && !duration) setDuration(video.duration);
+                          if (video.duration && !duration)
+                            setDuration(video.duration);
                         }}
                         onError={(e) => {
-                          console.error("Video 2 hatası:", e.currentTarget.error);
+                          console.error(
+                            "Video 2 hatası:",
+                            e.currentTarget.error
+                          );
                         }}
                       />
                     ) : (
-                      <div className="text-white/50 text-sm">Video yükleniyor...</div>
-                    )}
+                      <div className="text-white/50 text-sm">
+                        Video yükleniyor...
                       </div>
+                    )}
+                  </div>
                   {/* Video İsmi */}
                   <div className="absolute bottom-4 left-4 bg-black/70 text-white px-3 py-1.5 rounded-md text-sm font-medium backdrop-blur-sm">
                     {selectedVideo2Name || "Video 2"}

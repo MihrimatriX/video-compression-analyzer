@@ -12,7 +12,6 @@ import { Card } from "@/components/ui/card";
 import {
   ArrowLeft,
   Upload,
-  HardDrive,
   Clock,
   TrendingDown,
   FileVideo,
@@ -68,7 +67,8 @@ export function VideoAnalysisPage() {
       completedVideos.length > 0
         ? completedVideos.reduce(
             (acc, v) =>
-              acc + (v.analysis?.bestRecommendation?.estimatedSavingsPercent || 0),
+              acc +
+              (v.analysis?.bestRecommendation?.estimatedSavingsPercent || 0),
             0
           ) / completedVideos.length
         : 0;
@@ -294,9 +294,13 @@ function StatCard({
     >
       <div className={`shrink-0 ${highlight ? "" : "opacity-60"}`}>{icon}</div>
       <div className="flex flex-col min-w-0">
-        <span className="text-[9px] sm:text-[10px] opacity-70 truncate">{label}</span>
+        <span className="text-[9px] sm:text-[10px] opacity-70 truncate">
+          {label}
+        </span>
         <span
-          className={`text-[11px] sm:text-xs font-semibold truncate ${highlight ? "" : "text-foreground"}`}
+          className={`text-[11px] sm:text-xs font-semibold truncate ${
+            highlight ? "" : "text-foreground"
+          }`}
         >
           {value}
         </span>

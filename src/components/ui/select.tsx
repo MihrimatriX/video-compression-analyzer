@@ -74,7 +74,12 @@ const SelectContent = React.forwardRef<HTMLDivElement, SelectContentProps>(
 
       const handleClick = (e: MouseEvent) => {
         const target = e.target as Node;
-        if (ref && "current" in ref && ref.current && !ref.current.contains(target)) {
+        if (
+          ref &&
+          "current" in ref &&
+          ref.current &&
+          !ref.current.contains(target)
+        ) {
           context.setIsOpen(false);
         }
       };
@@ -133,4 +138,3 @@ const SelectItem = React.forwardRef<HTMLDivElement, SelectItemProps>(
 SelectItem.displayName = "SelectItem";
 
 export { Select, SelectTrigger, SelectValue, SelectContent, SelectItem };
-

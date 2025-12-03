@@ -3,7 +3,14 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { FileVideo, Settings, BookOpen, GitCompare, Play, AlertTriangle } from "lucide-react";
+import {
+  FileVideo,
+  Settings,
+  BookOpen,
+  GitCompare,
+  Play,
+  AlertTriangle,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "./ThemeToggle";
 import { LanguageToggle } from "./LanguageToggle";
@@ -35,10 +42,7 @@ export function Header() {
       >
         <div className="container mx-auto max-w-7xl flex h-16 items-center justify-between px-4">
           {/* Logo */}
-          <motion.div
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
+          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
             <Link
               href="/"
               className="flex items-center space-x-2 group transition-all"
@@ -76,7 +80,11 @@ export function Header() {
                         ? "text-primary"
                         : "text-muted-foreground hover:text-foreground"
                     )}
-                    title={item.href === "/converter" ? t("nav.converterWarning") : undefined}
+                    title={
+                      item.href === "/converter"
+                        ? t("nav.converterWarning")
+                        : undefined
+                    }
                   >
                     <Icon className="h-4 w-4" />
                     <span>{item.label}</span>
@@ -88,7 +96,11 @@ export function Header() {
                         layoutId="activeNav"
                         className="absolute inset-0 bg-primary/10 rounded-lg -z-10"
                         initial={false}
-                        transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                        transition={{
+                          type: "spring",
+                          bounce: 0.2,
+                          duration: 0.6,
+                        }}
                       />
                     )}
                     {!isActive && (

@@ -155,7 +155,9 @@ export default function Home() {
               <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center mx-auto mb-3 font-bold">
                 1
               </div>
-              <h3 className="font-medium text-sm mb-1">{t("howItWorks.step1.title")}</h3>
+              <h3 className="font-medium text-sm mb-1">
+                {t("howItWorks.step1.title")}
+              </h3>
               <p className="text-xs text-muted-foreground">
                 {t("howItWorks.step1.description")}
               </p>
@@ -164,7 +166,9 @@ export default function Home() {
               <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center mx-auto mb-3 font-bold">
                 2
               </div>
-              <h3 className="font-medium text-sm mb-1">{t("howItWorks.step2.title")}</h3>
+              <h3 className="font-medium text-sm mb-1">
+                {t("howItWorks.step2.title")}
+              </h3>
               <p className="text-xs text-muted-foreground">
                 {t("howItWorks.step2.description")}
               </p>
@@ -173,7 +177,9 @@ export default function Home() {
               <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center mx-auto mb-3 font-bold">
                 3
               </div>
-              <h3 className="font-medium text-sm mb-1">{t("howItWorks.step3.title")}</h3>
+              <h3 className="font-medium text-sm mb-1">
+                {t("howItWorks.step3.title")}
+              </h3>
               <p className="text-xs text-muted-foreground">
                 {t("howItWorks.step3.description")}
               </p>
