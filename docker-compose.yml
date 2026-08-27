@@ -1,0 +1,18 @@
+services:
+  video-compression-analyzer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: afu-video-compression-analyzer
+    ports:
+      - "7653:3000"
+    environment:
+      - NODE_ENV=production
+      - NEXT_TELEMETRY_DISABLED=1
+    restart: unless-stopped
+    networks:
+      - proxy-network
+
+networks:
+  proxy-network:
+    external: true
