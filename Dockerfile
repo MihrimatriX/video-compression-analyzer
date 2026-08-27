@@ -38,6 +38,9 @@ COPY --from=builder /app/package.json ./package.json
 # Set correct permissions
 RUN chown -R nextjs:nodejs /app
 
+# Install as root — global npm prefix is not writable by nextjs (exit 243)
+RUN npm install -g serve
+
 USER nextjs
 
 EXPOSE 3000
@@ -45,9 +48,4 @@ EXPOSE 3000
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
-# Since we're using static export, we need a simple HTTP server
-# Install serve for serving static files
-RUN npm install -g serve
-
-# Start the server
 CMD ["serve", "-s", "out", "-l", "3000", "--no-clipboard"]
