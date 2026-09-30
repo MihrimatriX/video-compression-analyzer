@@ -5,6 +5,12 @@ import type { VideoPreset } from "@/lib/presets/video-presets";
 interface VideoStore {
   videos: VideoFile[];
   selectedPreset: VideoPreset | null;
+  /** Karşılaştırma sayfasına gönderilecek dosya çifti (ör. orijinal + dönüştürülmüş) */
+  comparePair: { a: File; b: File } | null;
+  /** Analiz sayfasından "Özelleştir" ile dönüştürücüye gönderilen dosya */
+  converterFile: File | null;
+  setConverterFile: (file: File | null) => void;
+  setComparePair: (pair: { a: File; b: File } | null) => void;
   addVideos: (videos: VideoFile[]) => void;
   updateVideo: (id: string, updates: Partial<VideoFile>) => void;
   removeVideo: (id: string) => void;
@@ -16,6 +22,12 @@ interface VideoStore {
 export const useVideoStore = create<VideoStore>((set) => ({
   videos: [],
   selectedPreset: null,
+  comparePair: null,
+  converterFile: null,
+
+  setConverterFile: (converterFile) => set({ converterFile }),
+
+  setComparePair: (comparePair) => set({ comparePair }),
 
   addVideos: (newVideos) =>
     set((state) => ({

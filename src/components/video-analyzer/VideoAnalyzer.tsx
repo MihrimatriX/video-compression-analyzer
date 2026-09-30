@@ -24,9 +24,10 @@ export function VideoAnalyzer({ video }: VideoAnalyzerProps) {
       try {
         updateVideo(video.id, { status: "analyzing", progress: 0 });
 
-        // Extract metadata
+        // Gerçek metadata (codec, FPS, bitrate, ses) + küçük resim
         updateVideo(video.id, { progress: 20 });
-        const metadata = await analyzeVideo(video.file);
+        const { metadata, probe } = await analyzeVideo(video.file);
+        updateVideo(video.id, { probe });
 
         // Calculate optimal compression (preset varsa kullan)
         updateVideo(video.id, { progress: 60 });

@@ -1,3 +1,5 @@
+import type { EncodeResult, ProbeResult } from "@/lib/engine/types";
+
 export interface VideoMetadata {
   filename: string;
   fileSize: number;
@@ -14,6 +16,18 @@ export interface VideoMetadata {
   audioChannels?: number;
   audioSampleRate?: number;
   thumbnail?: string;
+  /** Kapsayıcı formatı (MP4, WebM, AVI ...) */
+  container?: string;
+  /** Sadece video akışının bitrate'i (bps) */
+  videoBitrate?: number;
+  variableFrameRate?: boolean;
+  hdr?: boolean;
+  bitDepth?: number;
+  rotation?: number;
+  audioTrackCount?: number;
+  subtitleTrackCount?: number;
+  /** Metadata hangi yöntemle okundu: webcodecs | ffmpeg-wasm | native | html5 */
+  analysisSource?: string;
 }
 
 export interface CompressionRecommendation {
@@ -58,6 +72,10 @@ export interface VideoFile {
   file: File;
   id: string;
   analysis?: VideoAnalysis;
+  /** Motor katmanının ham analiz sonucu (dönüştürmede yeniden kullanılır) */
+  probe?: ProbeResult;
+  /** Son dönüştürme sonucu */
+  conversion?: EncodeResult;
   status: "pending" | "analyzing" | "completed" | "error";
   error?: string;
   progress?: number;

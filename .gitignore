@@ -40,3 +40,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# self-hosted ffmpeg.wasm core (scripts/copy-ffmpeg-core.mjs üretir)
+/public/ffmpeg/
+
+# electron-builder çıktısı
+/release/

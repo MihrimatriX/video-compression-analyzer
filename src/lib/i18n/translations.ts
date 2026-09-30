@@ -1,3 +1,5 @@
+import { extraEn, extraTr } from "./translations-extra";
+
 export type Language = "tr" | "en";
 
 export const translations = {
@@ -559,6 +561,7 @@ export const translations = {
       "Dosya sistemi hatası ({size}MB dosya). FFmpeg.wasm bellek sınırlamaları nedeniyle bu dosyayı işleyemiyor. Lütfen daha küçük bir dosya deneyin, WebCodecs API destekleyen tarayıcı kullanın (Chrome/Edge) veya komut satırından FFmpeg kullanın.",
     "conversion.emptyOutput":
       "Encoding başarısız oldu - çıktı dosyası boş. Lütfen ayarları kontrol edin (özellikle codec ve profile ayarlarını) ve tekrar deneyin.",
+    ...extraTr,
   },
   en: {
     // Navigation
@@ -1111,6 +1114,7 @@ export const translations = {
       "File system error ({size}MB file). FFmpeg.wasm cannot process this file due to memory limitations. Please try a smaller file, use a browser that supports WebCodecs API (Chrome/Edge), or use FFmpeg from command line.",
     "conversion.emptyOutput":
       "Encoding failed - output file is empty. Please check your settings (especially codec and profile settings) and try again.",
+    ...extraEn,
   },
 } as const;
 

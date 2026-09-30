@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Copy, Check, Info, Loader2, Clock, Play } from "lucide-react";
+import { Copy, Check, Info, Loader2, Clock, Play, SlidersHorizontal } from "lucide-react";
+import Link from "next/link";
 import {
   Card,
   CardContent,
@@ -24,11 +25,9 @@ import { FFmpegCommandHighlighter } from "@/components/ui/ffmpeg-command-highlig
 import type { VideoFile } from "@/lib/types/video";
 import { useVideoStore } from "@/lib/store/video-store";
 import { useTranslation } from "@/lib/i18n/use-translation";
-import {
-  convertVideo,
-  type ConversionProgress,
-} from "@/lib/ffmpeg/video-converter";
-import { isWebCodecsSupported } from "@/lib/ffmpeg/webcodecs-converter";
+import { useEncode } from "@/hooks/use-encode";
+import { ConversionStatus } from "@/components/conversion/ConversionStatus";
+import { recommendationToOptions } from "@/lib/utils/recommendation-options";
 
 interface VideoCardProps {
   video: VideoFile;
@@ -41,16 +40,13 @@ export function VideoCard({
   selected = false,
   onSelect,
 }: VideoCardProps) {
-  const { selectedPreset } = useVideoStore();
+  const { selectedPreset, setConverterFile } = useVideoStore();
   const { t } = useTranslation();
   const [copiedCommand, setCopiedCommand] = useState(false);
   const [copiedSettings, setCopiedSettings] = useState(false);
   const [selectedCodecIndex, setSelectedCodecIndex] = useState(0);
-  const [isConverting, setIsConverting] = useState(false);
-  const [conversionProgress, setConversionProgress] =
-    useState<ConversionProgress | null>(null);
-  const [conversionError, setConversionError] = useState<string | null>(null);
-  const [useWebCodecs] = useState(isWebCodecsSupported());
+  const encode = useEncode();
+  const isConverting = encode.status === "running";
 
   // Tüm hook'lar conditional return'den önce çağrılmalı
   const recommendations = video.analysis?.recommendations || [];
@@ -203,84 +199,15 @@ export function VideoCard({
     }
   };
 
-  const handleConvert = async () => {
+  const handleConvert = () => {
     if (!video.file || !currentRecommendation) return;
-
-    setIsConverting(true);
-    setConversionError(null);
-    setConversionProgress({ progress: 0, time: 0 });
-
-    try {
-      // Conversion options'ı oluştur
-      // Bitrate bps (bits per second) olarak geliyor, FFmpeg için k/M formatına çevir
-      const formatBitrate = (bps: number): string => {
-        if (bps >= 1000000) {
-          return `${Math.round(bps / 1000000)}M`;
-        }
-        return `${Math.round(bps / 1000)}k`;
-      };
-
-      const options = {
-        codec: currentRecommendation.codec,
-        // CRF veya quality varsa bitrate kullanma (CRF modu)
-        bitrate:
-          !currentRecommendation.crf &&
-          !currentRecommendation.quality &&
-          currentRecommendation.bitrate
-            ? formatBitrate(currentRecommendation.bitrate)
-            : undefined,
-        crf: currentRecommendation.crf,
-        quality: currentRecommendation.quality,
-        preset: currentRecommendation.preset,
-        resolution: currentRecommendation.resolution,
-        audioBitrate: currentRecommendation.audioBitrate
-          ? formatBitrate(currentRecommendation.audioBitrate)
-          : "128k",
-        audioCodec: currentRecommendation.audioCodec,
-        pixelFormat: metadata.pixelFormat || "yuv420p",
-      };
-
-      const blob = await convertVideo(
-        video.file,
-        options,
-        (progress) => {
-          setConversionProgress(progress);
-        },
-        t,
-      );
-
-      // Dosyayı indir
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      const outputExtension =
-        options.codec === "vp9" || options.codec === "av1" ? ".webm" : ".mp4";
-      a.download = `${video.file.name.replace(
-        /\.[^/.]+$/,
-        "",
-      )}_converted${outputExtension}`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-
-      setConversionProgress({
-        progress: 100,
-        time: 0,
-        message: t("conversion.completed"),
-      });
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : String(error);
-      setConversionError(errorMessage);
-      console.error("Conversion hatası:", error);
-    } finally {
-      setIsConverting(false);
-      setTimeout(() => {
-        setConversionProgress(null);
-        setConversionError(null);
-      }, 3000);
-    }
+    void encode.start(
+      video.file,
+      recommendationToOptions(currentRecommendation, metadata),
+      video.probe,
+      undefined,
+      true,
+    );
   };
 
   const formatTime = (seconds: number): string => {
@@ -362,9 +289,8 @@ export function VideoCard({
             </div>
           )}
           {currentRecommendation.estimatedSavingsPercent > 0 && (
-            <div className="absolute right-2 top-2 rounded-md bg-primary px-2 py-1 text-xs font-semibold text-primary-foreground">
-              %{currentRecommendation.estimatedSavingsPercent.toFixed(1)}{" "}
-              {t("video.savings")}
+            <div className="absolute bottom-1 right-1 rounded bg-primary px-1 py-0.5 text-[9px] font-semibold leading-none text-primary-foreground">
+              -%{currentRecommendation.estimatedSavingsPercent.toFixed(0)}
             </div>
           )}
           {onSelect && (
@@ -637,25 +563,14 @@ export function VideoCard({
                       variant="default"
                       size="sm"
                       onClick={handleConvert}
-                      disabled={
-                        isConverting ||
-                        (!useWebCodecs && video.file.size > 50 * 1024 * 1024)
-                      }
+                      disabled={isConverting}
                       className="h-6 px-2 text-[10px] shrink-0"
-                      title={
-                        !useWebCodecs && video.file.size > 50 * 1024 * 1024
-                          ? t("conversion.fileTooLargeTooltip")
-                          : useWebCodecs
-                            ? t("conversion.gpuAcceleration")
-                            : t("conversion.convertAndDownload")
-                      }
+                      title={t("conversion.convertAndDownload")}
                     >
                       {isConverting ? (
                         <>
                           <Loader2 className="mr-1 h-3 w-3 animate-spin" />
-                          {conversionProgress?.progress
-                            ? `${Math.round(conversionProgress.progress)}%`
-                            : "..."}
+                          {Math.round((encode.progress?.progress ?? 0) * 100)}%
                         </>
                       ) : (
                         <>
@@ -664,28 +579,19 @@ export function VideoCard({
                         </>
                       )}
                     </Button>
+                    <Link
+                      href="/converter"
+                      onClick={() => setConverterFile(video.file)}
+                      title={t("enc.customize")}
+                    >
+                      <Button variant="outline" size="sm" className="h-6 w-6 p-0 shrink-0">
+                        <SlidersHorizontal className="h-3 w-3" />
+                      </Button>
+                    </Link>
                   </div>
-                  {(isConverting || conversionProgress || conversionError) && (
-                    <div className="mt-2 space-y-1">
-                      {conversionProgress && (
-                        <div className="space-y-1">
-                          <Progress value={conversionProgress.progress} />
-                          {conversionProgress.message && (
-                            <p className="text-[10px] text-muted-foreground">
-                              {conversionProgress.message}
-                              {conversionProgress.speed &&
-                                ` • ${conversionProgress.speed}`}
-                            </p>
-                          )}
-                        </div>
-                      )}
-                      {conversionError && (
-                        <div className="rounded-md bg-destructive/10 p-2 text-[10px] text-destructive">
-                          {conversionError}
-                        </div>
-                      )}
-                    </div>
-                  )}
+                  <div className="mt-2">
+                    <ConversionStatus encode={encode} originalFile={video.file} compact />
+                  </div>
                 </div>
               </TabsContent>
             </Tabs>

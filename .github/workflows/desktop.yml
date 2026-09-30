@@ -1,0 +1,45 @@
+name: Desktop builds
+
+# "v1.2.3" gibi bir etiket gönderildiğinde (veya elle tetiklendiğinde)
+# Windows, macOS ve Linux kurulum dosyalarını üretir.
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            script: desktop:dist:win
+          - os: macos-latest
+            script: desktop:dist:mac
+          - os: ubuntu-latest
+            script: desktop:dist:linux
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      # ffmpeg-static / ffprobe-static, üzerinde çalıştıkları platformun ikili dosyasını indirir
+      - run: npm ci
+      - run: npm run ${{ matrix.script }} -- --publish never
+        env:
+          # macOS imzalama/notarization için bu gizli değişkenleri ekleyin (isteğe bağlı)
+          CSC_LINK: ${{ secrets.MAC_CERT_P12_BASE64 }}
+          CSC_KEY_PASSWORD: ${{ secrets.MAC_CERT_PASSWORD }}
+          CSC_IDENTITY_AUTO_DISCOVERY: ${{ secrets.MAC_CERT_P12_BASE64 != '' }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: desktop-${{ matrix.os }}
+          path: |
+            release/*.exe
+            release/*.dmg
+            release/*.AppImage
+            release/*.deb
+          if-no-files-found: warn
