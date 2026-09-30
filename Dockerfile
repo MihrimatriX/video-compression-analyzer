@@ -8,7 +8,10 @@ WORKDIR /app
 
 # Copy package files
 COPY package.json package-lock.json* ./
-RUN npm ci
+# Web imajı için Electron ve yerel FFmpeg ikili dosyalarına gerek yok:
+# kurulum betiklerini atlıyoruz (ffmpeg.wasm çekirdeği "prebuild" adımında kopyalanır)
+ENV ELECTRON_SKIP_BINARY_DOWNLOAD=1
+RUN npm ci --ignore-scripts
 
 # Rebuild the source code only when needed
 FROM base AS builder
@@ -48,4 +51,5 @@ EXPOSE 3000
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
-CMD ["serve", "-s", "out", "-l", "3000", "--no-clipboard"]
+# -s (SPA modu) kullanılmaz: Next statik çıktısında her sayfa kendi HTML dosyasına sahiptir
+CMD ["serve", "out", "-l", "3000", "--no-clipboard"]

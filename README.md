@@ -39,6 +39,13 @@
 - 📱 **Responsive Design**: Works seamlessly on desktop, tablet, and mobile devices
 - 🎯 **Batch Processing**: Generate batch scripts for multiple videos
 - 📋 **FFmpeg Command Export**: Copy ready-to-use FFmpeg commands with syntax highlighting
+- ⚡ **Real conversion in the browser**: WebCodecs (GPU) via [Mediabunny](https://mediabunny.dev) writes proper MP4/WebM/MKV/MOV files with audio; FFmpeg.wasm fallback for AVI/FLV/WMV. No more 50 MB limit (files are read in chunks)
+- 🔍 **Accurate analysis**: real codec, frame rate (VFR detection), per-stream bitrate, HDR, rotation and audio details
+- 🎯 **Target-size mode**: fit a video into 10 MB (Discord), 16 MB (WhatsApp), 25 MB (e-mail)…
+- ✂️ **Trim, rotate, crop, audio extraction** (M4A / Opus / MP3 / WAV), metadata stripping
+- 📏 **Quality score**: PSNR / SSIM between the original and the output
+- 📦 **Batch conversion queue** with overall progress, cancel and "download all"
+- 🖥️ **Desktop app (Electron)**: native FFmpeg, NVENC / Quick Sync / AMF / VideoToolbox, two-pass encoding, files saved straight to disk — see [docs/DESKTOP.md](docs/DESKTOP.md)
 
 ### 🛠️ Technologies
 
@@ -48,6 +55,8 @@
 - **Tailwind CSS 4** - Utility-first styling
 - **Shadcn UI** - Beautiful component library
 - **FFmpeg.wasm** - Browser-based video processing
+- **Mediabunny** - WebCodecs-based demuxing, transcoding and muxing
+- **Electron** + **ffmpeg-static** - Desktop app with native FFmpeg
 - **Zustand** - Lightweight state management
 - **Framer Motion** - Smooth animations
 - **React Dropzone** - Drag & drop file uploads
@@ -66,6 +75,16 @@ npm run build
 ```
 
 The application will be available at `http://localhost:3000`
+
+#### 🖥️ Desktop app
+
+```bash
+npm run desktop:dev          # Next dev server + Electron window
+npm run desktop:start        # production build in Electron
+npm run desktop:dist:win     # Windows installer (.exe) — also :mac (.dmg) and :linux (AppImage/.deb)
+```
+
+Architecture, security model and packaging: [docs/DESKTOP.md](docs/DESKTOP.md) · Ideas & roadmap: [docs/ROADMAP.md](docs/ROADMAP.md)
 
 ### 📦 Installation
 
@@ -204,6 +223,13 @@ npm run build
 - 📱 **Responsive Tasarım**: Masaüstü, tablet ve mobil cihazlarda sorunsuz çalışır
 - 🎯 **Toplu İşleme**: Birden fazla video için batch script'leri oluşturma
 - 📋 **FFmpeg Komut Dışa Aktarma**: Syntax highlighting ile hazır FFmpeg komutlarını kopyalama
+- ⚡ **Tarayıcıda gerçek dönüştürme**: [Mediabunny](https://mediabunny.dev) ile WebCodecs (GPU) üzerinden sesli, gerçek MP4/WebM/MKV/MOV çıktısı; AVI/FLV/WMV için FFmpeg.wasm yedeği. 50 MB sınırı kalktı (dosyalar parça parça okunur)
+- 🔍 **Doğru analiz**: gerçek codec, kare hızı (VFR tespiti), akış bazında bitrate, HDR, döndürme ve ses bilgisi
+- 🎯 **Hedef boyut modu**: videoyu 10 MB (Discord), 16 MB (WhatsApp), 25 MB (e-posta)… boyutuna sığdırma
+- ✂️ **Kırpma, döndürme, crop, sesi ayırma** (M4A / Opus / MP3 / WAV), metadata temizleme
+- 📏 **Kalite skoru**: orijinal ile çıktı arasında PSNR / SSIM
+- 📦 **Toplu dönüştürme kuyruğu**: genel ilerleme, iptal ve "tümünü indir"
+- 🖥️ **Masaüstü uygulaması (Electron)**: yerel FFmpeg, NVENC / Quick Sync / AMF / VideoToolbox, iki geçişli kodlama, dosyalar doğrudan diske — bkz. [docs/DESKTOP.md](docs/DESKTOP.md)
 
 ### 🛠️ Teknolojiler
 
@@ -213,6 +239,8 @@ npm run build
 - **Tailwind CSS 4** - Utility-first stil sistemi
 - **Shadcn UI** - Güzel component kütüphanesi
 - **FFmpeg.wasm** - Tarayıcı tabanlı video işleme
+- **Mediabunny** - WebCodecs tabanlı okuma, dönüştürme ve kapsayıcı yazma
+- **Electron** + **ffmpeg-static** - Yerel FFmpeg ile masaüstü uygulaması
 - **Zustand** - Hafif state yönetimi
 - **Framer Motion** - Akıcı animasyonlar
 - **React Dropzone** - Sürükle-bırak dosya yükleme
@@ -231,6 +259,16 @@ npm run build
 ```
 
 Uygulama `http://localhost:3000` adresinde kullanılabilir olacaktır.
+
+#### 🖥️ Masaüstü uygulaması
+
+```bash
+npm run desktop:dev          # Next geliştirme sunucusu + Electron penceresi
+npm run desktop:start        # Üretim derlemesini Electron'da çalıştır
+npm run desktop:dist:win     # Windows kurulumu (.exe) — ayrıca :mac (.dmg) ve :linux (AppImage/.deb)
+```
+
+Mimari, güvenlik ve paketleme: [docs/DESKTOP.md](docs/DESKTOP.md) · Fikirler ve yol haritası: [docs/ROADMAP.md](docs/ROADMAP.md)
 
 ### 📦 Kurulum
 

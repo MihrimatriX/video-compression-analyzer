@@ -9,17 +9,19 @@ import {
   BookOpen,
   GitCompare,
   Play,
-  AlertTriangle,
+  Monitor,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "./ThemeToggle";
 import { LanguageToggle } from "./LanguageToggle";
 import { useTranslation } from "@/lib/i18n/use-translation";
 import { useMemo } from "react";
+import { useDesktop } from "@/hooks/use-desktop";
 
 export function Header() {
   const pathname = usePathname();
   const { t } = useTranslation();
+  const desktop = useDesktop() !== null;
 
   const navItems = useMemo(
     () => [
@@ -80,17 +82,9 @@ export function Header() {
                         ? "text-primary"
                         : "text-muted-foreground hover:text-foreground",
                     )}
-                    title={
-                      item.href === "/converter"
-                        ? t("nav.converterWarning")
-                        : undefined
-                    }
                   >
                     <Icon className="h-4 w-4" />
                     <span>{item.label}</span>
-                    {item.href === "/converter" && (
-                      <AlertTriangle className="h-3 w-3 text-yellow-500" />
-                    )}
                     {isActive && (
                       <motion.div
                         layoutId="activeNav"
@@ -117,10 +111,39 @@ export function Header() {
 
           {/* Right Side Actions */}
           <div className="flex items-center gap-1 border-l pl-2 ml-2">
+            {desktop && (
+              <span
+                className="mr-1 hidden items-center gap-1 rounded-md bg-primary/10 px-2 py-1 text-[11px] font-medium text-primary sm:flex"
+                title={t("desktop.badgeHint")}
+              >
+                <Monitor className="h-3 w-3" />
+                {t("desktop.badge")}
+              </span>
+            )}
             <LanguageToggle />
             <ThemeToggle />
           </div>
         </div>
+        {/* Mobil gezinme */}
+        <nav className="flex gap-1 overflow-x-auto border-t px-2 py-1.5 md:hidden">
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = pathname === item.href;
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={cn(
+                  "flex shrink-0 items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium",
+                  isActive ? "bg-primary/10 text-primary" : "text-muted-foreground",
+                )}
+              >
+                <Icon className="h-3.5 w-3.5" />
+                {item.label}
+              </Link>
+            );
+          })}
+        </nav>
       </motion.header>
     </>
   );

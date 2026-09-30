@@ -16,6 +16,8 @@ const eslintConfig = defineConfig([
     ".next/**",
     "out/**",
     "build/**",
+    "release/**",
+    "public/ffmpeg/**",
     "next-env.d.ts",
     // Avoid React plugin running on config files (ESLint 10 + eslint-config-next bug).
     "next.config.*",

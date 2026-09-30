@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { VideoResultsGrid } from "@/components/video-results/VideoResultsGrid";
 import { CompressionPresets } from "@/components/video-uploader/CompressionPresets";
 import { ParameterImpactAnalysis } from "./ParameterImpactAnalysis";
+import { BatchConvertPanel } from "@/components/conversion/BatchConvertPanel";
 import { useVideoStore } from "@/lib/store/video-store";
 import { useTranslation } from "@/lib/i18n/use-translation";
 import { Button } from "@/components/ui/button";
@@ -246,7 +247,8 @@ export function VideoAnalysisPage() {
         </div>
 
         {/* Orta Kolon - Video Listesi */}
-        <div className="md:col-span-2 xl:col-span-6 order-3 xl:order-2">
+        <div className="md:col-span-2 xl:col-span-6 order-3 xl:order-2 space-y-4">
+          <BatchConvertPanel />
           <VideoResultsGrid />
         </div>
 

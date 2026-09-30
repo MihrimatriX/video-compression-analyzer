@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/navigation/Header";
 import { Toaster } from "@/components/ui/sonner";
+import { DesktopMenuBridge } from "@/components/desktop/DesktopMenuBridge";
 import { HtmlLang } from "@/components/seo/HtmlLang";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { createPageMetadata, SITE_URL, siteConfig } from "@/lib/seo";
@@ -81,6 +82,7 @@ export default function RootLayout({
         <Header />
         <main>{children}</main>
         <Toaster />
+        <DesktopMenuBridge />
       </body>
     </html>
   );

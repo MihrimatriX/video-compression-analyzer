@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useTranslation } from "@/lib/i18n/use-translation";
+import { EngineSettingsCard } from "@/components/settings/EngineSettingsCard";
 
 export default function SettingsPage() {
   const { t } = useTranslation();
@@ -23,6 +24,8 @@ export default function SettingsPage() {
           {t("settings.subtitle")}
         </p>
       </div>
+
+      <EngineSettingsCard />
 
       <Tabs defaultValue="codecs" className="w-full">
         <TabsList className="grid w-full grid-cols-4">

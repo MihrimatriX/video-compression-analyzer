@@ -282,7 +282,9 @@ export function calculateOptimalCompression(
       metadata.height,
       metadata.framerate,
       codecInfo,
-      metadata.bitrate, // Orijinal bitrate'i geç
+      // Sadece video akışının bitrate'i (ses hariç) daha doğru bir referanstır
+      metadata.videoBitrate ??
+        Math.max(0, metadata.bitrate - (metadata.audioBitrate ?? 0)),
     );
 
     const crf = calculateOptimalCRF(codecInfo.codec);

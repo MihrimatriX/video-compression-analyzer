@@ -21,7 +21,7 @@ import {
 import Link from "next/link";
 import { useDropzone } from "react-dropzone";
 export default function ComparePage() {
-  const { videos } = useVideoStore();
+  const { videos, comparePair, setComparePair } = useVideoStore();
   const { t } = useTranslation();
   const [selectedVideo1, setSelectedVideo1] = useState<File | null>(null);
   const [selectedVideo2, setSelectedVideo2] = useState<File | null>(null);
@@ -50,6 +50,16 @@ export default function ComparePage() {
   const container2Ref = useRef<HTMLDivElement>(null);
 
   const completedVideos = videos.filter((v) => v.analysis);
+
+  // Dönüştürme sonucundan "Orijinal ile karşılaştır" ile gelindiyse çifti yükle
+  useEffect(() => {
+    if (!comparePair) return;
+    setSelectedVideo1(comparePair.a);
+    setSelectedVideo1Name(comparePair.a.name);
+    setSelectedVideo2(comparePair.b);
+    setSelectedVideo2Name(comparePair.b.name);
+    setComparePair(null);
+  }, [comparePair, setComparePair]);
 
   // Video URL state
   const [video1Url, setVideo1Url] = useState<string | null>(null);
